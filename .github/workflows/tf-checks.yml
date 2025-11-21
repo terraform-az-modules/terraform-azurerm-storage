@@ -5,11 +5,30 @@ on:
   pull_request:
   workflow_dispatch:
 jobs:
-# Update 'Job name' and 'working_directory' as needed based on the module structure.
+  ad-auth-example:
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
+    with:
+      working_directory: './examples/ad_auth/'
+
+  basic-example:
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
+    with:
+      working_directory: './examples/basic/'
+
+  cmk-enabled-example:
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
+    with:
+      working_directory: './examples/cmk_enabled/'
+
   complete-example:
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
       working_directory: './examples/complete/'
+
+  private-endpoint-example:
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
+    with:
+      working_directory: './examples/private_endpoint/'
   
 # Seperate Job for TFlint workflow call
   tf-lint:

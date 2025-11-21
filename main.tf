@@ -1,10 +1,9 @@
 ##-----------------------------------------------------------------------------
-## Tagging Module – Applies standard tags to all resources
+# Standard Tagging Module – Applies standard tags to all resources for traceability
 ##-----------------------------------------------------------------------------
 module "labels" {
-  # source          = "terraform-az-modules/tags/azure"
-  # version         = "1.0.0"
-  source          = "git::https://github.com/terraform-az-modules/terraform-azure-tags.git?ref=master"
+  source          = "terraform-az-modules/tags/azurerm"
+  version         = "1.0.2"
   name            = var.custom_name == null ? var.name : var.custom_name
   location        = var.location
   environment     = var.environment
@@ -19,9 +18,8 @@ module "labels" {
 ## Storage Account - Create a Storage account with custormer managed key encryption and its components.  
 ##-----------------------------------------------------------------------------------------------------
 resource "azurerm_storage_account" "storage" {
-  provider                          = azurerm.main_sub
   count                             = var.enabled ? 1 : 0
-  name                              = substr(lower(replace(replace(var.resource_position_prefix ? format("ast%s", local.name) : format("%sast", local.name), "-", ""), " ", "")), 0, 24)
+  name                              = substr(lower(replace(var.resource_position_prefix ? format("ast%s", local.name) : format("%sast", local.name), "/[^a-zA-Z0-9]/", "")), 0, 24)
   resource_group_name               = var.resource_group_name
   location                          = var.location
   account_kind                      = var.account_kind
@@ -102,14 +100,6 @@ resource "azurerm_storage_account" "storage" {
     content {
       name          = var.custom_domain_name
       use_subdomain = var.use_subdomain
-    }
-  }
-
-  dynamic "static_website" {
-    for_each = var.static_website_config != null ? [1] : []
-    content {
-      index_document     = var.static_website_config.index_document
-      error_404_document = var.static_website_config.error_404_document
     }
   }
 
@@ -194,6 +184,16 @@ resource "azurerm_storage_account" "storage" {
   }
 }
 
+##-----------------------------------------------------------------------------
+## Static Website - Create a static website for storage account.
+##-----------------------------------------------------------------------------
+resource "azurerm_storage_account_static_website" "static_website" {
+  count              = var.enable_static_website ? 1 : 0
+  storage_account_id = azurerm_storage_account.storage[0].id
+  error_404_document = var.error_404_document
+  index_document     = var.index_document
+}
+
 ##----------------------------------------------------------------------------- 
 ## Queue Properties - Create a queue properties for storage account .
 ##-----------------------------------------------------------------------------
@@ -231,28 +231,19 @@ resource "azurerm_storage_account_queue_properties" "queue_properties" {
   }
 }
 
-# ##----------------------------------------------------------------------------- 
-# ## Key Vault - Creates a key vault that will be used for encryption.  
-# ##-----------------------------------------------------------------------------
+##----------------------------------------------------------------------------- 
+## Key Vault - Creates a key vault that will be used for encryption.  
+##-----------------------------------------------------------------------------
 resource "azurerm_key_vault_key" "kvkey" {
-  provider        = azurerm.main_sub
   depends_on      = [azurerm_role_assignment.identity_assigned, azurerm_role_assignment.rbac_keyvault_crypto_officer]
   count           = var.enabled && var.cmk_encryption_enabled ? 1 : 0
   name            = var.resource_position_prefix ? format("kvk-%s", local.name) : format("%s-kvk", local.name)
   expiration_date = var.expiration_date
   key_vault_id    = var.key_vault_id
-  # key_type        = "RSA-HSM"
-  key_type = "RSA"
-  key_size = 2048
-  tags     = module.labels.tags
-  key_opts = [
-    "decrypt",
-    "encrypt",
-    "sign",
-    "unwrapKey",
-    "verify",
-    "wrapKey",
-  ]
+  key_type        = var.key_type
+  key_size        = var.key_size
+  tags            = module.labels.tags
+  key_opts        = var.key_opts
 
   dynamic "rotation_policy" {
     for_each = var.rotation_policy_enabled ? var.rotation_policy : {}
@@ -271,8 +262,7 @@ resource "azurerm_key_vault_key" "kvkey" {
 ## Network Rules - Creates network rules for controlling access and enhancing security.  
 ##--------------------------------------------------------------------------------------
 resource "azurerm_storage_account_network_rules" "network-rules" {
-  provider                   = azurerm.main_sub
-  for_each                   = var.enabled ? { for rule in var.network_rules : rule.default_action => rule } : {}
+  for_each                   = var.enabled && var.enable_network_rules ? { for rule in var.network_rules : rule.default_action => rule } : {}
   storage_account_id         = azurerm_storage_account.storage[0].id
   default_action             = lookup(each.value, "default_action", "Deny")
   ip_rules                   = lookup(each.value, "ip_rules", null)
@@ -292,7 +282,6 @@ resource "azurerm_storage_account_network_rules" "network-rules" {
 ## Threat Protection - Create threat protection to detect and respond to suspicious or potentially malicious activities. 
 ##---------------------------------------------------------------------------------------------------------------------------
 resource "azurerm_advanced_threat_protection" "atp" {
-  provider           = azurerm.main_sub
   count              = local.create_advanced_threat_protection ? 1 : 0
   target_resource_id = azurerm_storage_account.storage[0].id
   enabled            = var.enable_advanced_threat_protection
@@ -302,7 +291,6 @@ resource "azurerm_advanced_threat_protection" "atp" {
 ## Storage Container - Defines a container within the storage account to store blobs (objects) such as logs, data files, or media.
 ##------------------------------------------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_container" "container" {
-  provider              = azurerm.main_sub
   count                 = var.enabled ? length(var.containers_list) : 0
   name                  = var.resource_position_prefix ? format("sc-%s", local.name) : format("%s-sc", local.name)
   storage_account_id    = azurerm_storage_account.storage[0].id
@@ -314,9 +302,8 @@ resource "azurerm_storage_container" "container" {
 ## for lift-and-shift applications, legacy workloads, or shared storage needs.
 ##---------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_share" "fileshare" {
-  provider           = azurerm.main_sub
   count              = var.enabled ? length(var.file_shares) : 0
-  name               = var.resource_position_prefix ? format("ssf-%s", local.name) : format("%s-ssf", local.name)
+  name               = var.resource_position_prefix ? format("sfs-%s", local.name) : format("%s-sfs", local.name)
   storage_account_id = azurerm_storage_account.storage[0].id
   quota              = var.file_shares[count.index].quota
 }
@@ -326,7 +313,6 @@ resource "azurerm_storage_share" "fileshare" {
 ## store for structured, non-relational data.  
 ##------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_table" "tables" {
-  provider             = azurerm.main_sub
   count                = var.enabled ? length(var.tables) : 0
   name                 = var.resource_position_prefix ? format("sta%s", replace(local.name, "-", "")) : format("%ssta", replace(local.name, "-", ""))
   storage_account_name = azurerm_storage_account.storage[0].name
@@ -337,8 +323,7 @@ resource "azurerm_storage_table" "tables" {
 ## message-based communication between application components.
 ##---------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_queue" "queues" {
-  provider             = azurerm.main_sub
-  count                = var.enabled ? length(var.queues) : 0
+  count                = var.enabled && var.enable_queue ? length(var.queues) : 0
   name                 = var.resource_position_prefix ? format("sq-%s", local.name) : format("%s-sq", local.name)
   storage_account_name = azurerm_storage_account.storage[0].name
 }
@@ -348,7 +333,6 @@ resource "azurerm_storage_queue" "queues" {
 ## account, helping automate data retention, cost optimization, and compliance.  
 ##-------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_management_policy" "lifecycle_management" {
-  provider           = azurerm.main_sub
   count              = local.create_storage_mgmt_policy ? length(var.management_policy) : 0
   storage_account_id = azurerm_storage_account.storage[0].id
 
@@ -376,7 +360,6 @@ resource "azurerm_storage_management_policy" "lifecycle_management" {
           tier_to_cold_after_days_since_creation_greater_than            = it.value.tier_to_cold_after_days_since_creation_greater_than
           tier_to_cold_after_days_since_last_access_time_greater_than    = it.value.tier_to_cold_after_days_since_last_access_time_greater_than
           tier_to_cool_after_days_since_last_access_time_greater_than    = it.value.tier_to_cool_after_days_since_last_access_time_greater_than
-
         }
         snapshot {
           delete_after_days_since_creation_greater_than                  = it.value.snapshot_delete_after_days
@@ -388,21 +371,10 @@ resource "azurerm_storage_management_policy" "lifecycle_management" {
   }
 }
 
-##------------------------------------------------------------------------------------------------------------------------------------------
-## Provider block
-## To be used only when there is existing private dns zone in different subscription. Mention other subscription id in 'var.alias_sub'. 
-##------------------------------------------------------------------------------------------------------------------------------------------
-provider "azurerm" {
-  alias = "peer"
-  features {}
-  subscription_id = var.alias_sub
-}
-
 ##----------------------------------------------------------------------------- 
 ## Private Endpoint - Create private endpoint for storage account. 
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_endpoint" "pep" {
-  provider            = azurerm.main_sub
   count               = var.enabled && var.enable_private_endpoint ? 1 : 0
   name                = var.resource_position_prefix ? format("pe-%s", local.name) : format("%s-pe", local.name)
   location            = var.location
@@ -433,7 +405,6 @@ resource "azurerm_private_endpoint" "pep" {
 ## logs and metrics to an Azure Monitor Log Analytics workspace, Event Hub, or Storage Account.
 ##-----------------------------------------------------------------------------------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "storage" {
-  provider                       = azurerm.main_sub
   count                          = var.enabled && var.enable_diagnostic ? 1 : 0
   name                           = var.resource_position_prefix ? format("amds-%s", local.name) : format("%s-amds", local.name)
   target_resource_id             = azurerm_storage_account.storage[0].id
@@ -455,7 +426,6 @@ resource "azurerm_monitor_diagnostic_setting" "storage" {
 ## Monitor Diagnostic Setting - Create diagnostic setting for storage Data. 
 ##-----------------------------------------------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "datastorage" {
-  provider                       = azurerm.main_sub
   depends_on                     = [azurerm_storage_account.storage]
   count                          = local.create_monitor_diagnostic ? length(var.datastorages) : 0
   name                           = var.resource_position_prefix ? format("mdsd-%s", local.name) : format("%s-mdsd", local.name)
@@ -485,7 +455,6 @@ resource "azurerm_monitor_diagnostic_setting" "datastorage" {
 ## Monitor Diagnostic Setting - Create diagnostic setting for storage-nic. 
 ##-----------------------------------------------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "storage-nic" {
-  provider                       = azurerm.main_sub
   depends_on                     = [azurerm_private_endpoint.pep]
   count                          = local.create_monitor_diagnostic_nic ? 1 : 0
   name                           = var.resource_position_prefix ? format("mds-%s", local.name) : format("%s-mds", local.name)
@@ -495,10 +464,14 @@ resource "azurerm_monitor_diagnostic_setting" "storage-nic" {
   eventhub_authorization_rule_id = var.eventhub_authorization_rule_id
   log_analytics_workspace_id     = var.log_analytics_workspace_id
   log_analytics_destination_type = var.log_analytics_destination_type
-  metric {
-    category = "AllMetrics"
-    enabled  = var.Metric_enable
+  dynamic "metric" {
+    for_each = var.metrics
+    content {
+      category = metric.value
+      enabled  = true
+    }
   }
+
   lifecycle {
     ignore_changes = [log_analytics_destination_type]
   }
@@ -508,9 +481,8 @@ resource "azurerm_monitor_diagnostic_setting" "storage-nic" {
 ## Monitor Diagnostic Setting - Create diagnostic setting for storage blob. 
 ##-----------------------------------------------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "storage_blob" {
-  provider                       = azurerm.main_sub
   count                          = var.enable_blob_diagnostics ? 1 : 0
-  name                           = format("%s-blob-diagnostics", local.name)
+  name                           = var.resource_position_prefix ? format("blob-diag-%s", local.name) : format("%s-blob-diag", local.name)
   target_resource_id             = "${azurerm_storage_account.storage[0].id}/blobServices/default"
   storage_account_id             = var.storage_account_id
   eventhub_name                  = var.eventhub_name
@@ -537,9 +509,8 @@ resource "azurerm_monitor_diagnostic_setting" "storage_blob" {
 ## Monitor Diagnostic Setting - Create diagnostic setting for storage table. 
 ##-----------------------------------------------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "storage_table" {
-  provider                       = azurerm.main_sub
   count                          = var.enable_table_diagnostics ? 1 : 0
-  name                           = format("%s-table-diagnostics", local.name)
+  name                           = var.resource_position_prefix ? format("table-diag-%s", local.name) : format("%s-table-diag", local.name)
   target_resource_id             = "${azurerm_storage_account.storage[0].id}/tableServices/default"
   storage_account_id             = var.storage_account_id
   eventhub_name                  = var.eventhub_name
@@ -566,9 +537,8 @@ resource "azurerm_monitor_diagnostic_setting" "storage_table" {
 ## Monitor Diagnostic Setting - Create diagnostic setting for storage queue. 
 ##-----------------------------------------------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "storage_queue" {
-  provider                       = azurerm.main_sub
   count                          = var.enable_queue_diagnostics ? 1 : 0
-  name                           = format("%s-queue-diagnostics", local.name)
+  name                           = var.resource_position_prefix ? format("queue-diag-%s", local.name) : format("%s-queue-diag", local.name)
   target_resource_id             = "${azurerm_storage_account.storage[0].id}/queueServices/default"
   storage_account_id             = var.storage_account_id
   eventhub_name                  = var.eventhub_name
@@ -595,9 +565,8 @@ resource "azurerm_monitor_diagnostic_setting" "storage_queue" {
 ## Monitor Diagnostic Setting - Create diagnostic setting for storage file. 
 ##-----------------------------------------------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "storage_file" {
-  provider                       = azurerm.main_sub
   count                          = var.enable_file_diagnostics ? 1 : 0
-  name                           = format("%s-file-diagnostics", local.name)
+  name                           = var.resource_position_prefix ? format("file-diag-%s", local.name) : format("%s-file-diag", local.name)
   target_resource_id             = "${azurerm_storage_account.storage[0].id}/fileServices/default"
   storage_account_id             = var.storage_account_id
   eventhub_name                  = var.eventhub_name

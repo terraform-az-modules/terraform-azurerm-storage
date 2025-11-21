@@ -3,19 +3,14 @@ provider "azurerm" {
   storage_use_azuread = true
 }
 
-provider "azurerm" {
-  features {}
-  alias = "peer"
-}
-
 data "azurerm_client_config" "current_client_config" {}
 
 ##----------------------------------------------------------------------------- 
 ## Resource Group module call
 ##-----------------------------------------------------------------------------
 module "resource_group" {
-  source      = "terraform-az-modules/resource-group/azure"
-  version     = "1.0.0"
+  source      = "terraform-az-modules/resource-group/azurerm"
+  version     = "1.0.3"
   name        = "app1"
   environment = "test"
   location    = "northeurope"
@@ -26,11 +21,6 @@ module "resource_group" {
 ## Here storage account will be deployed with Active Directory Integration. 
 ##-----------------------------------------------------------------------------
 module "storage" {
-  providers = {
-    azurerm.dns_sub  = azurerm.peer,
-    azurerm.main_sub = azurerm
-  }
-
   source                        = "../.."
   name                          = "core"
   environment                   = "dev"

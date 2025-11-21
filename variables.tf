@@ -82,7 +82,7 @@ variable "resource_group_name" {
 
 variable "location" {
   type        = string
-  default     = "North Europe"
+  default     = ""
   description = "The location/region to keep all your network resources. To get the list of all locations with table format from azure cli, run 'az account list-locations -o table'"
 }
 
@@ -120,6 +120,48 @@ variable "min_tls_version" {
   type        = string
   default     = "TLS1_2"
   description = "The minimum supported TLS version for the storage account"
+}
+
+variable "shared_access_key_enabled" {
+  type        = bool
+  default     = true
+  description = " Indicates whether the storage account permits requests to be authorized with the account access key via Shared Key. If false, then all requests, including shared access signatures, must be authorized with Azure Active Directory (Azure AD). The default value is true."
+}
+
+variable "infrastructure_encryption_enabled" {
+  type        = bool
+  default     = true
+  description = " Is infrastructure encryption enabled? Changing this forces a new resource to be created. Defaults to false."
+}
+
+variable "public_network_access_enabled" {
+  type        = bool
+  default     = true
+  description = "Whether the public network access is enabled? Defaults to true."
+}
+
+variable "default_to_oauth_authentication" {
+  type        = bool
+  default     = false
+  description = "Default to Azure Active Directory authorization in the Azure portal when accessing the Storage Account. The default value is false"
+}
+
+variable "cross_tenant_replication_enabled" {
+  type        = bool
+  default     = true
+  description = "Should cross Tenant replication be enabled? Defaults to true."
+}
+
+variable "allow_nested_items_to_be_public" {
+  type        = bool
+  default     = false
+  description = "Allow or disallow nested items within this Account to opt into being public. Defaults to true."
+}
+
+variable "allowed_copy_scope" {
+  type        = string
+  default     = "PrivateLink"
+  description = "Restrict copy to and from Storage Accounts within an AAD tenant or with Private Links to the same VNet. Possible values are AAD and PrivateLink."
 }
 
 variable "containers_list" {
@@ -205,6 +247,12 @@ variable "queues" {
   default     = []
 }
 
+variable "enable_queue" {
+  type        = bool
+  default     = true
+  description = "Enable or disable the creation of the queues"
+}
+
 variable "management_policy" {
   description = "Configure Azure Storage firewalls and virtual networks"
   type = list(object({
@@ -253,13 +301,23 @@ variable "management_policy" {
 ##-----------------------------------------------------------------------------
 ## Static Website
 ##-----------------------------------------------------------------------------
-variable "static_website_config" {
-  type = object({
-    index_document     = optional(string)
-    error_404_document = optional(string)
-  })
-  default     = null
-  description = "Static website configuration. Can only be set when the `account_kind` is set to `StorageV2` or `BlockBlobStorage`."
+
+variable "enable_static_website" {
+  type        = bool
+  default     = false
+  description = "Enable or disable the creation of the static website configuration"
+}
+
+variable "error_404_document" {
+  type        = string
+  default     = "404.html"
+  description = "The name of the error document for the static website."
+}
+
+variable "index_document" {
+  type        = string
+  default     = "index.html"
+  description = "The name of the index document for the static website."
 }
 
 ##-----------------------------------------------------------------------------
@@ -285,7 +343,7 @@ variable "queue_properties_logging" {
 
 variable "enable_queue_properties" {
   type        = bool
-  default     = true
+  default     = false
   description = "Enable or disable the creation of the queue properties"
 }
 
@@ -376,9 +434,12 @@ variable "identity_type" {
   default     = "UserAssigned"
 }
 
+##-----------------------------------------------------------------------------
+## Key Vault & CMK
+##-----------------------------------------------------------------------------
 variable "key_vault_id" {
   type    = string
-  default = ""
+  default = null
 }
 
 variable "expiration_date" {
@@ -387,46 +448,41 @@ variable "expiration_date" {
   description = "Expiration UTC datetime (Y-m-d'T'H:M:S'Z')"
 }
 
-variable "shared_access_key_enabled" {
-  type        = bool
-  default     = false
-  description = " Indicates whether the storage account permits requests to be authorized with the account access key via Shared Key. If false, then all requests, including shared access signatures, must be authorized with Azure Active Directory (Azure AD). The default value is true."
-}
-
-variable "infrastructure_encryption_enabled" {
-  type        = bool
-  default     = true
-  description = " Is infrastructure encryption enabled? Changing this forces a new resource to be created. Defaults to false."
-}
-
-variable "public_network_access_enabled" {
-  type        = bool
-  default     = true
-  description = "Whether the public network access is enabled? Defaults to true."
-}
-
-variable "default_to_oauth_authentication" {
-  type        = bool
-  default     = false
-  description = "Default to Azure Active Directory authorization in the Azure portal when accessing the Storage Account. The default value is false"
-}
-
-variable "cross_tenant_replication_enabled" {
-  type        = bool
-  default     = true
-  description = "Should cross Tenant replication be enabled? Defaults to true."
-}
-
-variable "allow_nested_items_to_be_public" {
-  type        = bool
-  default     = false
-  description = "Allow or disallow nested items within this Account to opt into being public. Defaults to true."
-}
-
-variable "allowed_copy_scope" {
+variable "key_type" {
   type        = string
-  default     = "PrivateLink"
-  description = "Restrict copy to and from Storage Accounts within an AAD tenant or with Private Links to the same VNet. Possible values are AAD and PrivateLink."
+  default     = "RSA"
+  description = "The type of key to use. Possible values are `RSA` and `RSA-HSM`."
+}
+
+variable "key_size" {
+  type        = number
+  default     = 2048
+  description = "The size of the key in bits. Possible values are `2048`, `3072`, and `4096` for RSA and `256` and `384` for EC."
+}
+
+variable "key_opts" {
+  type        = list(string)
+  default     = ["encrypt", "decrypt", "wrapKey", "unwrapKey", "sign", "verify"]
+  description = "A list of key operations that the key supports. Possible values are `encrypt`, `decrypt`, `wrapKey`, `unwrapKey`, `sign`, `verify`, `get`, `list`, `create`, `update`, `import`, `delete`, `recover`, and `backup`."
+}
+
+variable "key_permissions" {
+  type        = list(string)
+  default     = ["Create", "Delete", "Get", "Purge", "Recover", "Update", "Get", "WrapKey", "UnwrapKey", "List", "Decrypt", "Sign", "Encrypt"]
+  description = "A list of key permissions to be applied for the key vault access policy. Possible values are `get`, `list`, `update`, `create`, `import`, `delete`, `recover`, `backup`, `restore`, `decrypt`, `encrypt`, `wrapKey`, `unwrapKey`, `sign`, and `verify`."
+}
+
+variable "secret_permissions" {
+  type        = list(string)
+  default     = ["Get", "List", "Set", "Delete", "Recover", "Backup", "Restore", "Purge"]
+  description = "A list of secret permissions to be applied for the key vault access policy. Possible values are `get`, `list`, `set`, `delete`, `recover`, `backup`, `restore`, and `purge`."
+}
+
+variable "storage_permissions" {
+  type        = list(string)
+  default     = ["Get", "List"]
+  description = "A list of storage permissions to be applied for the key vault access policy. Possible values are `get`, `list`, `delete`, `set`, `update`, `regeneratekey`, `setsas`, and `listsas`."
+
 }
 
 variable "admin_objects_ids" {
@@ -578,7 +634,7 @@ variable "file_share_authentication" {
 }
 
 ##-----------------------------------------------------------------------------
-## Private Link Access
+## Private Link Access and Network Rules
 ##-----------------------------------------------------------------------------
 variable "enable_private_link_access" {
   type        = bool
@@ -593,6 +649,12 @@ variable "private_link_access" {
     endpoint_tenant_id   = string
   }))
   default = []
+}
+
+variable "enable_network_rules" {
+  type        = bool
+  default     = false
+  description = "Enable or disable the creation of the network_rules block."
 }
 
 ##-----------------------------------------------------------------------------
@@ -670,11 +732,6 @@ variable "datastorages" {
   default = ["blob", "queue", "table", "file"]
 }
 
-variable "alias_sub" {
-  type    = string
-  default = null
-}
-
 variable "management_policy_enable" {
   type    = bool
   default = false
@@ -684,12 +741,6 @@ variable "log_analytics_destination_type" {
   type        = string
   default     = "AzureDiagnostics"
   description = "Possible values are AzureDiagnostics and Dedicated, default to AzureDiagnostics. When set to Dedicated, logs sent to a Log Analytics workspace will go into resource specific tables, instead of the legacy AzureDiagnostics table."
-}
-
-variable "Metric_enable" {
-  type        = bool
-  default     = true
-  description = "Is this Diagnostic Metric enabled? Defaults to true."
 }
 
 variable "key_vault_rbac_auth_enabled" {

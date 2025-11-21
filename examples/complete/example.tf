@@ -3,102 +3,100 @@ provider "azurerm" {
   storage_use_azuread = true
 }
 
-provider "azurerm" {
-  features {}
-  alias = "peer"
-}
+# provider "azurerm" {
+#   features {}
+#   alias = "peer"
+# }
 
 data "azurerm_client_config" "current_client_config" {}
 
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 ## Resource Group module call
+## Resource group in which all resources will be deployed.
 ##-----------------------------------------------------------------------------
 module "resource_group" {
-  source      = "terraform-az-modules/resource-group/azure"
-  version     = "1.0.0"
-  name        = "app1"
-  environment = "test"
-  location    = "northeurope"
+  source      = "terraform-az-modules/resource-group/azurerm"
+  version     = "1.0.3"
+  name        = "core"
+  environment = "dev"
+  location    = "centralus"
+  label_order = ["name", "environment", "location"]
 }
 
-##----------------------------------------------------------------------------- 
-## Virtual Network module call.
-##-----------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Virtual Network
+# ------------------------------------------------------------------------------
 module "vnet" {
-  source              = "terraform-az-modules/vnet/azure"
-  version             = "1.0.0"
-  name                = "app1"
-  environment         = "test"
+  source              = "terraform-az-modules/vnet/azurerm"
+  version             = "1.0.3"
+  name                = "core"
+  environment         = "dev"
   label_order         = ["name", "environment", "location"]
   resource_group_name = module.resource_group.resource_group_name
   location            = module.resource_group.resource_group_location
   address_spaces      = ["10.0.0.0/16"]
 }
 
-##----------------------------------------------------------------------------- 
-## Subnet module call.
-##-----------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Subnet
+# ------------------------------------------------------------------------------
 module "subnet" {
-  source               = "clouddrove/subnet/azure"
-  version              = "1.2.0"
-  name                 = "app1"
-  environment          = "test"
-  label_order          = ["name", "environment"]
+  source               = "terraform-az-modules/subnet/azurerm"
+  version              = "1.0.1"
+  environment          = "dev"
+  label_order          = ["name", "environment", "location"]
   resource_group_name  = module.resource_group.resource_group_name
   location             = module.resource_group.resource_group_location
   virtual_network_name = module.vnet.vnet_name
-  service_endpoints    = ["Microsoft.Storage"]
-  subnet_names         = ["subnet1"]
-  subnet_prefixes      = ["10.0.1.0/24"]
+  subnets = [
+    {
+      name            = "subnet1"
+      subnet_prefixes = ["10.0.1.0/24"]
+    }
+  ]
 }
 
-##----------------------------------------------------------------------------- 
-## Log Analytics module call.
-##-----------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Log Analytics
+# ------------------------------------------------------------------------------
 module "log-analytics" {
-  source                           = "clouddrove/log-analytics/azure"
-  version                          = "2.0.0"
-  name                             = "app1"
-  environment                      = "test"
-  label_order                      = ["name", "environment"]
-  create_log_analytics_workspace   = true # Set  it 'false' if you don't want resource log-analytics workspace to be created
-  log_analytics_workspace_sku      = "PerGB2018"
-  daily_quota_gb                   = "-1"
-  internet_ingestion_enabled       = true
-  internet_query_enabled           = true
-  resource_group_name              = module.resource_group.resource_group_name
-  log_analytics_workspace_location = module.resource_group.resource_group_location
-  storage_account_id               = module.storage.storage_account_id
-  diagnostic_setting_enable        = true # Set it 'true' if you want azurerm_monitor_diagnostic_setting to be enabled
-
-}
-
-##----------------------------------------------------------------------------- 
-## Key Vault module call.
-##-----------------------------------------------------------------------------
-module "vault" {
-  providers = {
-    azurerm.main_sub = azurerm
-    azurerm.dns_sub  = azurerm.peer
-  }
-
-  source                      = "github.com/clouddrove/terraform-azure-key-vault.git?ref=master"
-  name                        = "vae59605811-neww"
-  environment                 = "test"
-  label_order                 = ["name", "environment"]
+  source                      = "terraform-az-modules/log-analytics/azurerm"
+  version                     = "1.0.2"
+  name                        = "core"
+  environment                 = "dev"
+  label_order                 = ["name", "environment", "location"]
+  log_analytics_workspace_sku = "PerGB2018"
   resource_group_name         = module.resource_group.resource_group_name
   location                    = module.resource_group.resource_group_location
-  admin_objects_ids           = [data.azurerm_client_config.current_client_config.object_id]
-  virtual_network_id          = module.vnet.vnet_id
-  subnet_id                   = module.subnet.default_subnet_id[0]
-  enable_rbac_authorization   = true
-  enabled_for_disk_encryption = false
+  log_analytics_workspace_id  = module.log-analytics.workspace_id
+}
 
-  ## Private endpoint
-  enable_private_endpoint = true
-  network_acls            = null
-
-  ## enable diagnostic setting
+# ------------------------------------------------------------------------------
+# Key Vault
+# ------------------------------------------------------------------------------
+module "vault" {
+  source                        = "terraform-az-modules/key-vault/azurerm"
+  version                       = "1.0.1"
+  name                          = "core"
+  environment                   = "dev"
+  label_order                   = ["name", "environment", "location"]
+  resource_group_name           = module.resource_group.resource_group_name
+  location                      = module.resource_group.resource_group_location
+  subnet_id                     = module.subnet.subnet_ids.subnet1
+  public_network_access_enabled = true
+  sku_name                      = "premium"
+  private_dns_zone_ids          = module.private_dns_zone.private_dns_zone_ids.key_vault
+  network_acls = {
+    bypass         = "AzureServices"
+    default_action = "Deny"
+    ip_rules       = ["0.0.0.0/0"]
+  }
+  reader_objects_ids = {
+    "Key Vault Administrator" = {
+      role_definition_name = "Key Vault Administrator"
+      principal_id         = data.azurerm_client_config.current_client_config.object_id
+    }
+  }
   diagnostic_setting_enable  = true
   log_analytics_workspace_id = module.log-analytics.workspace_id
 }
@@ -107,9 +105,9 @@ module "vault" {
 ## Storage module call.
 ##-----------------------------------------------------------------------------
 module "storage" {
-  providers = {
-    azurerm.main_sub = azurerm
-  }
+  # providers = {
+  #   azurerm.main_sub = azurerm
+  # }
   source                        = "../.."
   name                          = "core"
   environment                   = "dev"

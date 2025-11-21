@@ -3,62 +3,62 @@ provider "azurerm" {
   storage_use_azuread = true
 }
 
-provider "azurerm" {
-  features {}
-  alias = "peer"
-}
-
 data "azurerm_client_config" "current_client_config" {}
 
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 ## Resource Group module call
+## Resource group in which all resources will be deployed.
 ##-----------------------------------------------------------------------------
 module "resource_group" {
-  source      = "terraform-az-modules/resource-group/azure"
-  version     = "1.0.0"
-  name        = "app1"
-  environment = "test"
-  location    = "northeurope"
+  source      = "terraform-az-modules/resource-group/azurerm"
+  version     = "1.0.3"
+  name        = "core"
+  environment = "dev"
+  location    = "centralus"
   label_order = ["name", "environment", "location"]
 }
 
-##----------------------------------------------------------------------------- 
-## Virtual Network module call.
-##-----------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Virtual Network
+# ------------------------------------------------------------------------------
 module "vnet" {
-  source              = "terraform-az-modules/vnet/azure"
-  version             = "1.0.0"
-  name                = "app1"
-  environment         = "test"
+  source              = "terraform-az-modules/vnet/azurerm"
+  version             = "1.0.3"
+  name                = "core"
+  environment         = "dev"
   label_order         = ["name", "environment", "location"]
   resource_group_name = module.resource_group.resource_group_name
   location            = module.resource_group.resource_group_location
   address_spaces      = ["10.0.0.0/16"]
 }
 
-##----------------------------------------------------------------------------- 
-## Subnet module call.
-##-----------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Subnet
+# ------------------------------------------------------------------------------
 module "subnet" {
-  source               = "clouddrove/subnet/azure"
-  version              = "1.2.0"
-  name                 = "app1"
-  environment          = "test"
-  label_order          = ["name", "environment"]
+  source               = "terraform-az-modules/subnet/azurerm"
+  version              = "1.0.1"
+  environment          = "dev"
+  label_order          = ["name", "environment", "location"]
   resource_group_name  = module.resource_group.resource_group_name
   location             = module.resource_group.resource_group_location
   virtual_network_name = module.vnet.vnet_name
-  service_endpoints    = ["Microsoft.Storage"]
-  subnet_names         = ["subnet1"]
-  subnet_prefixes      = ["10.0.1.0/24"]
+  subnets = [
+    {
+      name            = "subnet1"
+      subnet_prefixes = ["10.0.1.0/24"]
+    }
+  ]
 }
 
 # ------------------------------------------------------------------------------
 # Private DNS Zone module call
 # ------------------------------------------------------------------------------
 module "private_dns_zone" {
-  source              = "github.com/clouddrove-sandbox/terraform-azure-private-dns-zone.git?ref=feat/private-dns-zone"
+  source              = "terraform-az-modules/private-dns/azurerm"
+  version             = "1.0.2"
   resource_group_name = module.resource_group.resource_group_name
+  label_order         = ["name", "environment", "location"]
 
   private_dns_config = [
     {
@@ -73,10 +73,7 @@ module "private_dns_zone" {
 ## Here storage account will be deployed with private dns zone. 
 ##-----------------------------------------------------------------------------
 module "storage" {
-  providers = {
-    azurerm.dns_sub  = azurerm.peer,
-    azurerm.main_sub = azurerm
-  }
+
   source                        = "../.."
   name                          = "core"
   environment                   = "dev"
