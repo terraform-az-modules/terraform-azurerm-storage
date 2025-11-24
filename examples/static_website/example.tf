@@ -28,8 +28,9 @@ module "storage" {
   account_replication_type = "LRS"
 
   #static website configuration
-  error_404_document = "404.html"
-  index_document     = "index.html"
+  enable_static_website = true
+  error_404_document    = "404.html"
+  index_document        = "index.html"
 
   # Public access required for static websites
   public_network_access_enabled   = true

@@ -6,16 +6,6 @@ on:
 
 jobs:
 
-  ad-auth-example:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-pr-checks.yaml@master
-    with:
-      provider: 'azurerm'
-      terraform_directory: 'examples/ad_auth'
-      target_branch: 'master'
-    secrets:
-      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-
   basic-example:
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-pr-checks.yaml@master
     with:

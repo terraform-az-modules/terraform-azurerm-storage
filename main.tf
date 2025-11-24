@@ -188,7 +188,7 @@ resource "azurerm_storage_account" "storage" {
 ## Static Website - Create a static website for storage account.
 ##-----------------------------------------------------------------------------
 resource "azurerm_storage_account_static_website" "static_website" {
-  count              = var.enable_static_website ? 1 : 0
+  count              = var.enabled && var.enable_static_website ? 1 : 0
   storage_account_id = azurerm_storage_account.storage[0].id
   error_404_document = var.error_404_document
   index_document     = var.index_document
@@ -376,7 +376,7 @@ resource "azurerm_storage_management_policy" "lifecycle_management" {
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_endpoint" "pep" {
   count               = var.enabled && var.enable_private_endpoint ? 1 : 0
-  name                = var.resource_position_prefix ? format("pe-%s", local.name) : format("%s-pe", local.name)
+  name                = var.resource_position_prefix ? format("pe-%s", azurerm_storage_account.storage[0].name) : format("%s-pe", azurerm_storage_account.storage[0].name)
   location            = var.location
   resource_group_name = var.resource_group_name
   subnet_id           = var.subnet_id
@@ -481,7 +481,7 @@ resource "azurerm_monitor_diagnostic_setting" "storage-nic" {
 ## Monitor Diagnostic Setting - Create diagnostic setting for storage blob. 
 ##-----------------------------------------------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "storage_blob" {
-  count                          = var.enable_blob_diagnostics ? 1 : 0
+  count                          = var.enabled && var.enable_blob_diagnostics ? 1 : 0
   name                           = var.resource_position_prefix ? format("blob-diag-%s", local.name) : format("%s-blob-diag", local.name)
   target_resource_id             = "${azurerm_storage_account.storage[0].id}/blobServices/default"
   storage_account_id             = var.storage_account_id
@@ -509,7 +509,7 @@ resource "azurerm_monitor_diagnostic_setting" "storage_blob" {
 ## Monitor Diagnostic Setting - Create diagnostic setting for storage table. 
 ##-----------------------------------------------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "storage_table" {
-  count                          = var.enable_table_diagnostics ? 1 : 0
+  count                          = var.enabled && var.enable_table_diagnostics ? 1 : 0
   name                           = var.resource_position_prefix ? format("table-diag-%s", local.name) : format("%s-table-diag", local.name)
   target_resource_id             = "${azurerm_storage_account.storage[0].id}/tableServices/default"
   storage_account_id             = var.storage_account_id
@@ -537,7 +537,7 @@ resource "azurerm_monitor_diagnostic_setting" "storage_table" {
 ## Monitor Diagnostic Setting - Create diagnostic setting for storage queue. 
 ##-----------------------------------------------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "storage_queue" {
-  count                          = var.enable_queue_diagnostics ? 1 : 0
+  count                          = var.enabled && var.enable_queue_diagnostics ? 1 : 0
   name                           = var.resource_position_prefix ? format("queue-diag-%s", local.name) : format("%s-queue-diag", local.name)
   target_resource_id             = "${azurerm_storage_account.storage[0].id}/queueServices/default"
   storage_account_id             = var.storage_account_id
@@ -565,7 +565,7 @@ resource "azurerm_monitor_diagnostic_setting" "storage_queue" {
 ## Monitor Diagnostic Setting - Create diagnostic setting for storage file. 
 ##-----------------------------------------------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "storage_file" {
-  count                          = var.enable_file_diagnostics ? 1 : 0
+  count                          = var.enabled && var.enable_file_diagnostics ? 1 : 0
   name                           = var.resource_position_prefix ? format("file-diag-%s", local.name) : format("%s-file-diag", local.name)
   target_resource_id             = "${azurerm_storage_account.storage[0].id}/fileServices/default"
   storage_account_id             = var.storage_account_id
@@ -588,3 +588,4 @@ resource "azurerm_monitor_diagnostic_setting" "storage_file" {
     }
   }
 }
+

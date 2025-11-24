@@ -58,6 +58,9 @@ module "private_dns_zone" {
   source              = "terraform-az-modules/private-dns/azurerm"
   version             = "1.0.2"
   resource_group_name = module.resource_group.resource_group_name
+  name                = "core"
+  environment         = "dev"
+  location            = module.resource_group.resource_group_location
   label_order         = ["name", "environment", "location"]
 
   private_dns_config = [
@@ -73,20 +76,19 @@ module "private_dns_zone" {
 ## Here storage account will be deployed with private dns zone. 
 ##-----------------------------------------------------------------------------
 module "storage" {
-
   source                        = "../.."
   name                          = "core"
   environment                   = "dev"
   label_order                   = ["name", "environment", "location"]
   resource_group_name           = module.resource_group.resource_group_name
   location                      = module.resource_group.resource_group_location
-  public_network_access_enabled = true
+  public_network_access_enabled = false
   account_kind                  = "StorageV2"
   account_tier                  = "Standard"
   admin_objects_ids             = [data.azurerm_client_config.current_client_config.object_id]
   enable_private_endpoint       = true
   private_dns_zone_ids          = module.private_dns_zone.private_dns_zone_ids.storage_account
-  subnet_id                     = module.subnet.default_subnet_id[0]
+  subnet_id                     = module.subnet.subnet_ids["subnet1"]
   network_rules = [
     {
       default_action             = "Deny"

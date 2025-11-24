@@ -3,11 +3,6 @@ provider "azurerm" {
   storage_use_azuread = true
 }
 
-# provider "azurerm" {
-#   features {}
-#   alias = "peer"
-# }
-
 data "azurerm_client_config" "current_client_config" {}
 
 ##-----------------------------------------------------------------------------
@@ -18,7 +13,7 @@ module "resource_group" {
   source      = "terraform-az-modules/resource-group/azurerm"
   version     = "1.0.3"
   name        = "core"
-  environment = "dev"
+  environment = "qa"
   location    = "centralus"
   label_order = ["name", "environment", "location"]
 }
@@ -30,7 +25,7 @@ module "vnet" {
   source              = "terraform-az-modules/vnet/azurerm"
   version             = "1.0.3"
   name                = "core"
-  environment         = "dev"
+  environment         = "qa"
   label_order         = ["name", "environment", "location"]
   resource_group_name = module.resource_group.resource_group_name
   location            = module.resource_group.resource_group_location
@@ -43,7 +38,7 @@ module "vnet" {
 module "subnet" {
   source               = "terraform-az-modules/subnet/azurerm"
   version              = "1.0.1"
-  environment          = "dev"
+  environment          = "qa"
   label_order          = ["name", "environment", "location"]
   resource_group_name  = module.resource_group.resource_group_name
   location             = module.resource_group.resource_group_location
@@ -63,7 +58,7 @@ module "log-analytics" {
   source                      = "terraform-az-modules/log-analytics/azurerm"
   version                     = "1.0.2"
   name                        = "core"
-  environment                 = "dev"
+  environment                 = "qa"
   label_order                 = ["name", "environment", "location"]
   log_analytics_workspace_sku = "PerGB2018"
   resource_group_name         = module.resource_group.resource_group_name
@@ -78,14 +73,14 @@ module "vault" {
   source                        = "terraform-az-modules/key-vault/azurerm"
   version                       = "1.0.1"
   name                          = "core"
-  environment                   = "dev"
+  environment                   = "stage"
   label_order                   = ["name", "environment", "location"]
   resource_group_name           = module.resource_group.resource_group_name
   location                      = module.resource_group.resource_group_location
   subnet_id                     = module.subnet.subnet_ids.subnet1
   public_network_access_enabled = true
-  sku_name                      = "premium"
-  private_dns_zone_ids          = module.private_dns_zone.private_dns_zone_ids.key_vault
+  enable_private_endpoint       = false
+  sku_name                      = "standard"
   network_acls = {
     bypass         = "AzureServices"
     default_action = "Deny"
@@ -97,17 +92,13 @@ module "vault" {
       principal_id         = data.azurerm_client_config.current_client_config.object_id
     }
   }
-  diagnostic_setting_enable  = true
-  log_analytics_workspace_id = module.log-analytics.workspace_id
+  diagnostic_setting_enable = false
 }
 
 ##----------------------------------------------------------------------------- 
 ## Storage module call.
 ##-----------------------------------------------------------------------------
 module "storage" {
-  # providers = {
-  #   azurerm.main_sub = azurerm
-  # }
   source                        = "../.."
   name                          = "core"
   environment                   = "dev"
@@ -127,9 +118,8 @@ module "storage" {
   }]
 
   ## customer_managed_key can only be set when the account_kind is set to StorageV2 or account_tier set to Premium, and the identity type is UserAssigned.
-  cmk_encryption_enabled   = true
-  key_vault_id             = module.vault.id
-  management_policy_enable = true
+  cmk_encryption_enabled = true
+  key_vault_id           = module.vault.id
 
   ##   Storage Container
   containers_list = [
@@ -141,6 +131,7 @@ module "storage" {
     { name = "fileshare", quota = "10" },
   ]
 
+  ## Enable diagnostic settings
   enable_diagnostic          = true
   log_analytics_workspace_id = module.log-analytics.workspace_id
 }

@@ -308,16 +308,24 @@ variable "enable_static_website" {
   description = "Enable or disable the creation of the static website configuration"
 }
 
-variable "error_404_document" {
-  type        = string
-  default     = "404.html"
-  description = "The name of the error document for the static website."
-}
-
 variable "index_document" {
   type        = string
   default     = "index.html"
   description = "The name of the index document for the static website."
+  validation {
+    condition     = length(trimspace(var.index_document)) > 0
+    error_message = "index_document cannot be empty or whitespace."
+  }
+}
+
+variable "error_404_document" {
+  type        = string
+  default     = "404.html"
+  description = "The name of the error document for the static website."
+  validation {
+    condition     = length(trimspace(var.error_404_document)) > 0
+    error_message = "error_404_document cannot be empty or whitespace."
+  }
 }
 
 ##-----------------------------------------------------------------------------
@@ -733,8 +741,9 @@ variable "datastorages" {
 }
 
 variable "management_policy_enable" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
+  description = "Enable or disable the creation of the management policy block."
 }
 
 variable "log_analytics_destination_type" {

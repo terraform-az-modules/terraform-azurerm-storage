@@ -26,5 +26,5 @@ module "storage" {
   location                 = module.resource_group.resource_group_location
   account_kind             = "StorageV2"
   account_tier             = "Standard"
-  account_replication_type = "GRS"
+  account_replication_type = "LRS"
 }

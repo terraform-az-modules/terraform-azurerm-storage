@@ -23,7 +23,7 @@ module "vault" {
   source                        = "terraform-az-modules/key-vault/azurerm"
   version                       = "1.0.1"
   name                          = "core"
-  environment                   = "dev"
+  environment                   = "prod"
   label_order                   = ["name", "environment", "location"]
   resource_group_name           = module.resource_group.resource_group_name
   location                      = module.resource_group.resource_group_location
@@ -45,7 +45,7 @@ module "vault" {
 module "storage" {
   source                        = "../.."
   name                          = "core"
-  environment                   = "dev"
+  environment                   = "prod"
   label_order                   = ["name", "environment", "location"]
   resource_group_name           = module.resource_group.resource_group_name
   location                      = module.resource_group.resource_group_location
