@@ -134,7 +134,7 @@ This table contains both Prerequisites and Providers:
 | <a name="input_key_vault_rbac_auth_enabled"></a> [key\_vault\_rbac\_auth\_enabled](#input\_key\_vault\_rbac\_auth\_enabled) | Is key vault has role base access enable or not. | `bool` | `true` | no |
 | <a name="input_label_order"></a> [label\_order](#input\_label\_order) | The order of labels used to construct resource names or tags. If not specified, defaults to ['name', 'environment', 'location']. | `list(any)` | <pre>[<br>  "name",<br>  "environment",<br>  "location"<br>]</pre> | no |
 | <a name="input_large_file_share_enabled"></a> [large\_file\_share\_enabled](#input\_large\_file\_share\_enabled) | Is Large File Share Enabled? | `bool` | `false` | no |
-| <a name="input_location"></a> [location](#input\_location) | The location/region to keep all your network resources. To get the list of all locations with table format from azure cli, run 'az account list-locations -o table' | `string` | `"North Europe"` | no |
+| <a name="input_location"></a> [location](#input\_location) | The location/region to keep all your network resources. To get the list of all locations with table format from azure cli, run 'az account list-locations -o table' | `string` | `""` | no |
 | <a name="input_log_analytics_destination_type"></a> [log\_analytics\_destination\_type](#input\_log\_analytics\_destination\_type) | Possible values are AzureDiagnostics and Dedicated, default to AzureDiagnostics. When set to Dedicated, logs sent to a Log Analytics workspace will go into resource specific tables, instead of the legacy AzureDiagnostics table. | `string` | `"AzureDiagnostics"` | no |
 | <a name="input_log_analytics_workspace_id"></a> [log\_analytics\_workspace\_id](#input\_log\_analytics\_workspace\_id) | log analytics workspace id to pass it to destination details of diagnosys setting of NSG. | `string` | `null` | no |
 | <a name="input_logs"></a> [logs](#input\_logs) | n/a | `list(string)` | <pre>[<br>  "StorageWrite",<br>  "StorageRead",<br>  "StorageDelete"<br>]</pre> | no |
@@ -218,7 +218,7 @@ Refer [here](CHANGELOG.md).
 Big thanks to our contributors for elevating our project with their dedication and expertise! But, we do not wish to stop there, would like to invite contributions from the community in improving these projects and making them more versatile for better reach. Remember, every bit of contribution is immensely valuable, as, together, we are moving in only 1 direction, i.e. forward. 
 
 <a href="https://github.com/terraform-az-modules/terraform-azure-storage/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=terraform-az-modules/terraform-azure-storage-template&max" />
+  <img src="https://contrib.rocks/image?repo=terraform-az-modules/terraform-azure-storage&max" />
 </a>
 <br>
 <br>

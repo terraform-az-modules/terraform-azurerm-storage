@@ -92,7 +92,7 @@ module "storage" {
   network_rules = [
     {
       default_action             = "Deny"
-      ip_rules                   = ["0.0.0.0/0"]
+      ip_rules                   = []
       virtual_network_subnet_ids = []
       bypass                     = ["AzureServices"]
   }]

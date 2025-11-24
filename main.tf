@@ -19,7 +19,7 @@ module "labels" {
 ##-----------------------------------------------------------------------------------------------------
 resource "azurerm_storage_account" "storage" {
   count                             = var.enabled ? 1 : 0
-  name                              = substr(lower(replace(var.resource_position_prefix ? format("ast%s", local.name) : format("%sast", local.name), "/[^a-zA-Z0-9]/", "")), 0, 24)
+  name                              = substr(lower(replace(var.resource_position_prefix ? format("ast%s", local.name) : format("%sast", local.name), "-", "")), 0, 24)
   resource_group_name               = var.resource_group_name
   location                          = var.location
   account_kind                      = var.account_kind
@@ -134,7 +134,7 @@ resource "azurerm_storage_account" "storage" {
   }
 
   dynamic "share_properties" {
-    for_each = var.file_share_cors_rules != null && var.file_share_retention_policy_in_days != null && var.file_share_properties_smb != null ? [1] : []
+    for_each = var.file_share_cors_rules != null || var.file_share_retention_policy_in_days != null || var.file_share_properties_smb != null ? [1] : []
     content {
       dynamic "cors_rule" {
         for_each = var.enable_file_share_cors_rules ? var.file_share_cors_rules : []
@@ -222,7 +222,7 @@ resource "azurerm_storage_account_queue_properties" "queue_properties" {
   }
 
   dynamic "minute_metrics" {
-    for_each = var.enable_minute_metrics ? toset(var.minute_metrics) : []
+    for_each = var.enable_minute_metrics ? var.minute_metrics : []
     content {
       version               = minute_metrics.value.version
       include_apis          = minute_metrics.value.include_apis
@@ -262,7 +262,7 @@ resource "azurerm_key_vault_key" "kvkey" {
 ## Network Rules - Creates network rules for controlling access and enhancing security.  
 ##--------------------------------------------------------------------------------------
 resource "azurerm_storage_account_network_rules" "network-rules" {
-  for_each                   = var.enabled && var.enable_network_rules ? { for rule in var.network_rules : rule.default_action => rule } : {}
+  for_each                   = var.enabled && var.enable_network_rules ? { for i, rule in var.network_rules : i => rule } : {}
   storage_account_id         = azurerm_storage_account.storage[0].id
   default_action             = lookup(each.value, "default_action", "Deny")
   ip_rules                   = lookup(each.value, "ip_rules", null)
@@ -292,7 +292,7 @@ resource "azurerm_advanced_threat_protection" "atp" {
 ##------------------------------------------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_container" "container" {
   count                 = var.enabled ? length(var.containers_list) : 0
-  name                  = var.resource_position_prefix ? format("sc-%s", local.name) : format("%s-sc", local.name)
+  name                  = var.containers_list[count.index].name
   storage_account_id    = azurerm_storage_account.storage[0].id
   container_access_type = var.containers_list[count.index].access_type
 }
@@ -303,7 +303,7 @@ resource "azurerm_storage_container" "container" {
 ##---------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_share" "fileshare" {
   count              = var.enabled ? length(var.file_shares) : 0
-  name               = var.resource_position_prefix ? format("sfs-%s", local.name) : format("%s-sfs", local.name)
+  name               = var.file_shares[count.index].name
   storage_account_id = azurerm_storage_account.storage[0].id
   quota              = var.file_shares[count.index].quota
 }
@@ -314,7 +314,7 @@ resource "azurerm_storage_share" "fileshare" {
 ##------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_table" "tables" {
   count                = var.enabled ? length(var.tables) : 0
-  name                 = var.resource_position_prefix ? format("sta%s", replace(local.name, "-", "")) : format("%ssta", replace(local.name, "-", ""))
+  name                 = var.tables[count.index].name
   storage_account_name = azurerm_storage_account.storage[0].name
 }
 
@@ -324,7 +324,7 @@ resource "azurerm_storage_table" "tables" {
 ##---------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_queue" "queues" {
   count                = var.enabled && var.enable_queue ? length(var.queues) : 0
-  name                 = var.resource_position_prefix ? format("sq-%s", local.name) : format("%s-sq", local.name)
+  name                 = var.queues[count.index].name
   storage_account_name = azurerm_storage_account.storage[0].name
 }
 
@@ -417,7 +417,7 @@ resource "azurerm_monitor_diagnostic_setting" "storage" {
     for_each = var.metrics
     content {
       category = metric.value
-      enabled  = var.metrics_enabled[count.index]
+      enabled  = var.metrics_enabled[metric.key]
     }
   }
 }

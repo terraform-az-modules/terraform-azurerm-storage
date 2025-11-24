@@ -100,7 +100,7 @@ variable "access_tier" {
 
 variable "account_replication_type" {
   type        = string
-  default     = "GRS"
+  default     = "LRS"
   description = "Defines the type of replication to use for this storage account. Valid options are LRS, GRS, RAGRS, ZRS, GZRS and RAGZRS."
 }
 
@@ -281,7 +281,7 @@ variable "management_policy" {
     tier_to_archive_after_days                                     = 50,
     delete_after_days                                              = 100,
     snapshot_delete_after_days                                     = 30,
-    auto_tier_to_hot_from_cool_enabled                             = "true",
+    auto_tier_to_hot_from_cool_enabled                             = true,
     delete_after_days_since_creation_greater_than                  = 60,
     delete_after_days_since_last_access_time_greater_than          = 30,
     delete_after_days_since_modification_greater_than              = 365,

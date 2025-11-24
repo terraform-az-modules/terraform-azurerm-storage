@@ -45,7 +45,7 @@ output "storage_primary_access_key" {
 
 output "containers" {
   value       = { for c in azurerm_storage_container.container : c.name => c.id }
-  description = "Map of containers."
+  description = "Map of Storage containers."
 }
 
 output "file_shares" {
@@ -54,12 +54,12 @@ output "file_shares" {
 }
 
 output "tables" {
-  description = "Map of Storage SMB file shares."
+  description = "Map of Storage Tables."
   value       = { for t in azurerm_storage_table.tables : t.name => t.id }
 }
 
 output "queues" {
-  description = "Map of Storage SMB file shares."
+  description = "Map of Storage Queues."
   value       = { for q in azurerm_storage_queue.queues : q.name => q.id }
 }
 
