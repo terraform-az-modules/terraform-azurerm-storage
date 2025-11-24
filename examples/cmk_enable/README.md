@@ -27,9 +27,9 @@ This example demonstrates how to deploy an Azure Storage Account using the `terr
 
 | Name           | Source                                                   | Version |
 |----------------|----------------------------------------------------------|---------|
-| resource_group | terraform-az-modules/resource-group/azure               | 1.0.0   |
+| resource_group | terraform-az-modules/resource-group/azurerm               | 1.0.3   |
 | storage        | ../..                                                   | n/a     |
-| vault          | github.com/clouddrove/terraform-azure-key-vault.git     | master  |
+| vault          | terraform-az-modules/key-vault/azurerm     | 1.0.1 |
 
 ---
 

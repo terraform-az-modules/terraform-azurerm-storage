@@ -34,11 +34,11 @@ This example showcases a complete deployment of an Azure Storage Account using t
 | Name            | Source                                                   | Version |
 |-----------------|----------------------------------------------------------|---------|
 | log-analytics   | clouddrove/log-analytics/azure                          | 2.0.0   |
-| resource_group  | terraform-az-modules/resource-group/azure              | 1.0.0   |
+| resource_group  | terraform-az-modules/resource-group/azurerm              | 1.0.3   |
 | storage         | ../..                                                   | n/a     |
-| subnet          | terraform-az-modules/subnet/azure                       | 1.0.0   |
-| vault           | github.com/clouddrove/terraform-azure-key-vault.git     | master  |
-| vnet            | terraform-az-modules/vnet/azure                         | 1.0.0   |
+| subnet          | terraform-az-modules/subnet/azurerm                       | 1.0.1   |
+| vault           | terraform-az-modules/key-vault/azurerm     | 1.0.1  |
+| vnet            | terraform-az-modules/vnet/azurerm                         | 1.0.3   |
 
 ---
 

@@ -25,7 +25,7 @@ _No providers are explicitly defined in this example._
 
 | Name           | Source                                     | Version |
 |----------------|--------------------------------------------|---------|
-| resource_group | terraform-az-modules/resource-group/azure | 1.0.0   |
+| resource_group | terraform-az-modules/resource-group/azurerm | 1.0.3   |
 | storage        | ../..                                     | n/a     |
 
 ---
