@@ -292,7 +292,7 @@ resource "azurerm_advanced_threat_protection" "atp" {
 ##------------------------------------------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_container" "container" {
   count                 = var.enabled ? length(var.containers_list) : 0
-  name                  = var.containers_list[count.index].name
+  name                  = var.resource_position_prefix ? format("sc-%s", local.name) : format("%s-sc", local.name)
   storage_account_id    = azurerm_storage_account.storage[0].id
   container_access_type = var.containers_list[count.index].access_type
 }
@@ -303,7 +303,7 @@ resource "azurerm_storage_container" "container" {
 ##---------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_share" "fileshare" {
   count              = var.enabled ? length(var.file_shares) : 0
-  name               = var.file_shares[count.index].name
+  name               = var.resource_position_prefix ? format("sfs-%s", local.name) : format("%s-sfs", local.name)
   storage_account_id = azurerm_storage_account.storage[0].id
   quota              = var.file_shares[count.index].quota
 }
@@ -314,7 +314,7 @@ resource "azurerm_storage_share" "fileshare" {
 ##------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_table" "tables" {
   count                = var.enabled ? length(var.tables) : 0
-  name                 = var.tables[count.index].name
+  name                 = var.resource_position_prefix ? format("sta%s", replace(local.name, "-", "")) : format("%ssta", replace(local.name, "-", ""))
   storage_account_name = azurerm_storage_account.storage[0].name
 }
 
@@ -324,7 +324,7 @@ resource "azurerm_storage_table" "tables" {
 ##---------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_queue" "queues" {
   count                = var.enabled && var.enable_queue ? length(var.queues) : 0
-  name                 = var.queues[count.index].name
+  name                 = var.resource_position_prefix ? format("sq-%s", local.name) : format("%s-sq", local.name)
   storage_account_name = azurerm_storage_account.storage[0].name
 }
 

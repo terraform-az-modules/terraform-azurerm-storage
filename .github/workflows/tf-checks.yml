@@ -5,11 +5,6 @@ on:
   pull_request:
   workflow_dispatch:
 jobs:
-  ad-auth-example:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
-    with:
-      working_directory: './examples/ad_auth/'
-
   basic-example:
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
@@ -18,7 +13,7 @@ jobs:
   cmk-enabled-example:
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
-      working_directory: './examples/cmk_enabled/'
+      working_directory: './examples/cmk_enable/'
 
   complete-example:
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
