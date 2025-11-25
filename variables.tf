@@ -726,9 +726,9 @@ variable "metrics" {
 }
 
 variable "metrics_enabled" {
-  description = "Enables or disables specific metrics. Provide a list of boolean values to specify which metrics should be enabled (`true`) or disabled (`false`)."
-  type    = list(bool)
-  default = [true, true]
+  description = "Flag to enable/disable Metrics d"
+  type        = list(bool)
+  default     = [true, true]
 }
 
 variable "logs" {
