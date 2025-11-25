@@ -568,6 +568,11 @@ variable "enable_minute_metrics" {
 }
 
 variable "minute_metrics" {
+  description = "Configures minute-level metrics for Azure resources.  
+- `enabled`: Determines if minute metrics are enabled.  
+- `version`: Specifies the version of the metrics to use.  
+- `include_apis`: Indicates whether API metrics are included.  
+- `retention_policy_days`: Sets the number of days to retain the metrics."
   type = list(object({
     enabled               = bool
     version               = string
