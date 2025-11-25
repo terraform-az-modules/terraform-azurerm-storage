@@ -365,10 +365,7 @@ variable "enable_routing" {
 }
 
 variable "routing" {
-  description = "Configures routing options for Azure resources.  
-- `publish_internet_endpoints`: Boolean to enable or disable publishing to internet endpoints.  
-- `publish_microsoft_endpoints`: Boolean to enable or disable publishing to Microsoft endpoints.  
-- `choice`: String to specify the routing choice."
+  description = "Configuration for Routing"
   type = list(object({
     publish_internet_endpoints  = bool
     publish_microsoft_endpoints = bool
