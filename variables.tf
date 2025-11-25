@@ -731,9 +731,9 @@ variable "metrics_enabled" {
 }
 
 variable "logs" {
-  description = "List of log categories to be enabled for the resource."
-  type    = list(string)
-  default = ["StorageWrite", "StorageRead", "StorageDelete"]
+  description = "Logging configuration for s"
+  type        = list(string)
+  default     = ["StorageWrite", "StorageRead", "StorageDelete"]
 }
 
 variable "datastorages" {
