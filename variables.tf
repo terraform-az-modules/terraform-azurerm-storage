@@ -675,6 +675,9 @@ variable "enable_sas_policy" {
 }
 
 variable "sas_policy_settings" {
+  description = "Configures SAS policy settings for Azure resources.  
+- `expiration_period`: Specifies the duration before the SAS token expires.  
+- `expiration_action`: Defines the action to take upon expiration of the SAS token."
   type = list(object({
     expiration_period = string
     expiration_action = string
