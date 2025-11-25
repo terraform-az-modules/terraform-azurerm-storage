@@ -721,9 +721,9 @@ variable "log_analytics_workspace_id" {
 }
 
 variable "metrics" {
-  description = "Specifies a list of metrics to be enabled for monitoring and analysis. Each entry should be a metric name as a string."
-  type    = list(string)
-  default = ["Transaction", "Capacity"]
+  description = "Configuration for Metrics"
+  type        = list(string)
+  default     = ["Transaction", "Capacity"]
 }
 
 variable "metrics_enabled" {
