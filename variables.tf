@@ -771,6 +771,10 @@ variable "rotation_policy_enabled" {
 }
 
 variable "rotation_policy" {
+  description = "Configures the rotation policy for resources.  
+- `time_before_expiry`: Duration before the resource expires.  
+- `expire_after`: Time period after which the resource is considered expired.  
+- `notify_before_expiry`: Time frame to notify before the resource expires."
   type = map(object({
     time_before_expiry   = string
     expire_after         = string
