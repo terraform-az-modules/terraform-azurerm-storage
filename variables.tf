@@ -591,11 +591,7 @@ variable "enable_hour_metrics" {
 }
 
 variable "hour_metrics" {
-  description = "Configures the hour-level metrics for Azure resources.  
-- `enabled`: Determines if hour-level metrics are enabled.  
-- `version`: Specifies the version of the metrics to use.  
-- `include_apis`: Indicates whether API metrics should be included.  
-- `retention_policy_days`: Sets the number of days to retain the metrics data."
+  description = "Configuration for Hour Metrics"
   type = object({
     enabled               = bool
     version               = string
