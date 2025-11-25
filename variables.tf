@@ -446,6 +446,7 @@ variable "identity_type" {
 ## Key Vault & CMK
 ##-----------------------------------------------------------------------------
 variable "key_vault_id" {
+  description = "Specifies the ID of the Azure Key Vault to be used. This should be a valid Azure Key Vault resource ID in string format."
   type    = string
   default = null
 }
