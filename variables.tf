@@ -377,6 +377,7 @@ variable "routing" {
       choice                      = "MicrosoftRouting"
     }
   ]
+  description = "Configuration for Routing"
 }
 
 ##-----------------------------------------------------------------------------
@@ -446,8 +447,9 @@ variable "identity_type" {
 ## Key Vault & CMK
 ##-----------------------------------------------------------------------------
 variable "key_vault_id" {
-  type    = string
-  default = null
+  type        = string
+  default     = null
+  description = "ID of the Key Vault"
 }
 
 variable "expiration_date" {
@@ -582,6 +584,7 @@ variable "minute_metrics" {
       retention_policy_days = 7
     }
   ]
+  description = "Configuration for Minute Metrics"
 }
 
 variable "enable_hour_metrics" {
@@ -603,6 +606,7 @@ variable "hour_metrics" {
     include_apis          = false
     retention_policy_days = 7
   }
+  description = "Configuration for Hour Metrics"
 }
 
 ##-----------------------------------------------------------------------------
@@ -685,6 +689,7 @@ variable "sas_policy_settings" {
       expiration_action = "Log"
     }
   ]
+  description = "Configuration for SAS Policy"
 }
 
 ##-----------------------------------------------------------------------------
@@ -721,23 +726,27 @@ variable "log_analytics_workspace_id" {
 }
 
 variable "metrics" {
-  type    = list(string)
-  default = ["Transaction", "Capacity"]
+  type        = list(string)
+  default     = ["Transaction", "Capacity"]
+  description = "Metric categories for diagnostics."
 }
 
 variable "metrics_enabled" {
-  type    = list(bool)
-  default = [true, true]
+  type        = list(bool)
+  default     = [true, true]
+  description = "Enable or disable the metric categories for diagnostics."
 }
 
 variable "logs" {
-  type    = list(string)
-  default = ["StorageWrite", "StorageRead", "StorageDelete"]
+  type        = list(string)
+  default     = ["StorageWrite", "StorageRead", "StorageDelete"]
+  description = "Log categories for diagnostics."
 }
 
 variable "datastorages" {
-  type    = list(string)
-  default = ["blob", "queue", "table", "file"]
+  type        = list(string)
+  default     = ["blob", "queue", "table", "file"]
+  description = "Data storages for diagnostics."
 }
 
 variable "management_policy_enable" {
@@ -776,7 +785,8 @@ variable "rotation_policy" {
     expire_after         = string
     notify_before_expiry = string
   }))
-  default = null
+  default     = null
+  description = "Key rotation policy configuration"
 }
 
 ##-----------------------------------------------------------------------------
