@@ -11,17 +11,10 @@ output "storage_account_name" {
   description = "The name of the storage account."
 }
 
-output "file_shares" {
-  description = "storage SMB file shares list"
-  value       = module.storage.file_shares
-}
-
-output "tables" {
-  description = "storage tables list"
-  value       = module.storage.tables
-}
-
-output "queues" {
-  description = "storage queues list"
-  value       = module.storage.queues
+##-----------------------------------------------------------------------------
+## Static website
+##-----------------------------------------------------------------------------
+output "static_website_url" {
+  value       = module.storage.storage_account_primary_web_endpoint
+  description = "The URL of the static website hosted in the storage account."
 }

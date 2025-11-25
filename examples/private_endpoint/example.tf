@@ -13,7 +13,7 @@ module "resource_group" {
   source      = "terraform-az-modules/resource-group/azurerm"
   version     = "1.0.3"
   name        = "core"
-  environment = "qa"
+  environment = "dev"
   location    = "centralus"
   label_order = ["name", "environment", "location"]
 }
@@ -25,7 +25,7 @@ module "vnet" {
   source              = "terraform-az-modules/vnet/azurerm"
   version             = "1.0.3"
   name                = "core"
-  environment         = "qa"
+  environment         = "dev"
   label_order         = ["name", "environment", "location"]
   resource_group_name = module.resource_group.resource_group_name
   location            = module.resource_group.resource_group_location
@@ -38,7 +38,7 @@ module "vnet" {
 module "subnet" {
   source               = "terraform-az-modules/subnet/azurerm"
   version              = "1.0.1"
-  environment          = "qa"
+  environment          = "dev"
   label_order          = ["name", "environment", "location"]
   resource_group_name  = module.resource_group.resource_group_name
   location             = module.resource_group.resource_group_location
@@ -52,86 +52,48 @@ module "subnet" {
 }
 
 # ------------------------------------------------------------------------------
-# Log Analytics
+# Private DNS Zone module call
 # ------------------------------------------------------------------------------
-module "log-analytics" {
-  source                      = "terraform-az-modules/log-analytics/azurerm"
-  version                     = "1.0.2"
-  name                        = "core"
-  environment                 = "qa"
-  label_order                 = ["name", "environment", "location"]
-  log_analytics_workspace_sku = "PerGB2018"
-  resource_group_name         = module.resource_group.resource_group_name
-  location                    = module.resource_group.resource_group_location
-  log_analytics_workspace_id  = module.log-analytics.workspace_id
-}
+module "private_dns_zone" {
+  source              = "terraform-az-modules/private-dns/azurerm"
+  version             = "1.0.2"
+  resource_group_name = module.resource_group.resource_group_name
+  name                = "core"
+  environment         = "dev"
+  location            = module.resource_group.resource_group_location
+  label_order         = ["name", "environment", "location"]
 
-# ------------------------------------------------------------------------------
-# Key Vault
-# ------------------------------------------------------------------------------
-module "vault" {
-  source                        = "terraform-az-modules/key-vault/azurerm"
-  version                       = "1.0.1"
-  name                          = "core"
-  environment                   = "qa"
-  label_order                   = ["name", "environment", "location"]
-  resource_group_name           = module.resource_group.resource_group_name
-  location                      = module.resource_group.resource_group_location
-  subnet_id                     = module.subnet.subnet_ids.subnet1
-  public_network_access_enabled = true
-  enable_private_endpoint       = false
-  sku_name                      = "standard"
-  network_acls = {
-    bypass         = "AzureServices"
-    default_action = "Deny"
-    ip_rules       = []
-  }
-  reader_objects_ids = {
-    "Key Vault Administrator" = {
-      role_definition_name = "Key Vault Administrator"
-      principal_id         = data.azurerm_client_config.current_client_config.object_id
+  private_dns_config = [
+    {
+      resource_type = "storage_account"
+      vnet_ids      = [module.vnet.vnet_id]
     }
-  }
-  diagnostic_setting_enable = false
+  ]
 }
 
 ##----------------------------------------------------------------------------- 
 ## Storage module call.
+## Here storage account will be deployed with private dns zone. 
 ##-----------------------------------------------------------------------------
 module "storage" {
   source                        = "../.."
   name                          = "core"
-  environment                   = "qa"
+  environment                   = "dev"
   label_order                   = ["name", "environment", "location"]
   resource_group_name           = module.resource_group.resource_group_name
   location                      = module.resource_group.resource_group_location
-  public_network_access_enabled = true
+  public_network_access_enabled = false
   account_kind                  = "StorageV2"
   account_tier                  = "Standard"
   admin_objects_ids             = [data.azurerm_client_config.current_client_config.object_id]
+  enable_private_endpoint       = true
+  private_dns_zone_ids          = module.private_dns_zone.private_dns_zone_ids.storage_account
+  subnet_id                     = module.subnet.subnet_ids["subnet1"]
   network_rules = [
     {
       default_action             = "Deny"
-      ip_rules                   = ["0.0.0.0/0"]
+      ip_rules                   = []
       virtual_network_subnet_ids = []
       bypass                     = ["AzureServices"]
   }]
-
-  ## customer_managed_key can only be set when the account_kind is set to StorageV2 or account_tier set to Premium, and the identity type is UserAssigned.
-  cmk_encryption_enabled = true
-  key_vault_id           = module.vault.id
-
-  ##   Storage Container
-  containers_list = [
-    { name = "app-test", access_type = "private" },
-  ]
-  tables = ["table1"]
-  queues = ["queue1"]
-  file_shares = [
-    { name = "fileshare", quota = "10" },
-  ]
-
-  ## Enable diagnostic settings
-  enable_diagnostic          = true
-  log_analytics_workspace_id = module.log-analytics.workspace_id
 }
