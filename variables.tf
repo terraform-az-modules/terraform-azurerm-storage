@@ -212,39 +212,39 @@ variable "edge_zone" {
 }
 
 variable "is_hns_enabled" {
-  description = "Is Hierarchical Namespace enabled? This can be used with Azure Data Lake Storage Gen 2."
   type        = bool
   default     = false
+  description = "Is Hierarchical Namespace enabled? This can be used with Azure Data Lake Storage Gen 2."
 }
 
 variable "sftp_enabled" {
-  description = "Boolean, enable SFTP for the storage account"
   type        = bool
   default     = false
+  description = "Boolean, enable SFTP for the storage account"
 }
 
 variable "enable_advanced_threat_protection" {
-  description = "Boolean flag which controls if advanced threat protection is enabled."
   default     = false
   type        = bool
+  description = "Boolean flag which controls if advanced threat protection is enabled."
 }
 
 variable "file_shares" {
-  description = "List of containers to create and their access levels."
   type        = list(object({ name = string, quota = number }))
   default     = []
+  description = "List of containers to create and their access levels."
 }
 
 variable "tables" {
-  description = "List of storage tables."
   type        = list(string)
   default     = []
+  description = "List of storage tables."
 }
 
 variable "queues" {
-  description = "List of storages queues"
   type        = list(string)
   default     = []
+  description = "List of storages queues"
 }
 
 variable "enable_queue" {
@@ -254,7 +254,6 @@ variable "enable_queue" {
 }
 
 variable "management_policy" {
-  description = "Configure Azure Storage firewalls and virtual networks"
   type = list(object({
     prefix_match                                                   = set(string)
     tier_to_cool_after_days                                        = number
@@ -296,6 +295,7 @@ variable "management_policy" {
     tier_to_cool_after_days_since_last_access_time_greater_than    = 60
 
   }]
+  description = "Configure Azure Storage firewalls and virtual networks"
 }
 
 ##-----------------------------------------------------------------------------
@@ -332,7 +332,6 @@ variable "error_404_document" {
 ## Queue Property Logging
 ##-----------------------------------------------------------------------------
 variable "queue_properties_logging" {
-  description = "Logging queue properties"
   type = object({
     delete                = optional(bool)
     read                  = optional(bool)
@@ -347,6 +346,7 @@ variable "queue_properties_logging" {
     version               = "1.0"
     retention_policy_days = 7
   }
+  description = "Logging queue properties"
 }
 
 variable "enable_queue_properties" {
@@ -438,9 +438,9 @@ variable "use_subdomain" {
 ## Identity
 ##-----------------------------------------------------------------------------
 variable "identity_type" {
-  description = "Specifies the type of Managed Service Identity that should be configured on this Storage Account. Possible values are `SystemAssigned`, `UserAssigned`, `SystemAssigned, UserAssigned` (to enable both)."
   type        = string
   default     = "UserAssigned"
+  description = "Specifies the type of Managed Service Identity that should be configured on this Storage Account. Possible values are `SystemAssigned`, `UserAssigned`, `SystemAssigned, UserAssigned` (to enable both)."
 }
 
 ##-----------------------------------------------------------------------------
@@ -496,9 +496,9 @@ variable "storage_permissions" {
 }
 
 variable "admin_objects_ids" {
-  description = "IDs of the objects that can do all operations on all keys, secrets and certificates."
   type        = list(string)
   default     = []
+  description = "IDs of the objects that can do all operations on all keys, secrets and certificates."
 }
 
 ##-----------------------------------------------------------------------------
@@ -517,16 +517,15 @@ variable "subnet_id" {
 }
 
 variable "private_dns_zone_ids" {
-  description = "The IDs of a private DNS zone."
   type        = string
   default     = null
+  description = "The IDs of a private DNS zone."
 }
 
 ##-----------------------------------------------------------------------------
 ## Data Protection 
 ##-----------------------------------------------------------------------------
 variable "storage_blob_data_protection" {
-  description = "Storage account blob Data protection parameters."
   type = object({
     change_feed_enabled                       = optional(bool, false)
     versioning_enabled                        = optional(bool, false)
@@ -542,10 +541,10 @@ variable "storage_blob_data_protection" {
     delete_retention_policy_in_days           = 7
     container_delete_retention_policy_in_days = 7
   }
+  description = "Storage account blob Data protection parameters."
 }
 
 variable "storage_blob_cors_rule" {
-  description = "Storage Account blob CORS rule. Please refer to the [documentation](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account#cors_rule) for more information."
   type = object({
     allowed_headers    = list(string)
     allowed_methods    = list(string)
@@ -553,7 +552,8 @@ variable "storage_blob_cors_rule" {
     exposed_headers    = list(string)
     max_age_in_seconds = number
   })
-  default = null
+  default     = null
+  description = "Storage Account blob CORS rule. Please refer to the [documentation](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account#cors_rule) for more information."
 }
 
 variable "restore_policy" {
@@ -613,7 +613,6 @@ variable "hour_metrics" {
 ## File Share Authentication
 ##-----------------------------------------------------------------------------
 variable "file_share_authentication" {
-  description = "Storage Account file shares authentication configuration."
   type = object({
     directory_type                 = string
     default_share_level_permission = optional(string, "None")
@@ -626,7 +625,8 @@ variable "file_share_authentication" {
       netbios_domain_name = optional(string)
     }))
   })
-  default = null
+  default     = null
+  description = "Storage Account file shares authentication configuration."
 
   validation {
     condition = var.file_share_authentication == null || (
@@ -655,12 +655,12 @@ variable "enable_private_link_access" {
 }
 
 variable "private_link_access" {
-  description = "List of Privatelink objects to allow access from."
   type = list(object({
     endpoint_resource_id = string
     endpoint_tenant_id   = string
   }))
-  default = []
+  default     = []
+  description = "List of Privatelink objects to allow access from."
 }
 
 variable "enable_network_rules" {
@@ -673,9 +673,9 @@ variable "enable_network_rules" {
 ## SAS Policy
 ##-----------------------------------------------------------------------------
 variable "enable_sas_policy" {
-  description = "Enable or disable the creation of the sas_policy block."
   type        = bool
   default     = false
+  description = "Enable or disable the creation of the sas_policy block."
 }
 
 variable "sas_policy_settings" {
