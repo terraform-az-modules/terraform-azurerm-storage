@@ -736,9 +736,9 @@ variable "logs" {
 }
 
 variable "datastorages" {
-  description = "Specifies a list of data storage names. Use this to define multiple storage resources within your configuration."
-  type    = list(string)
-  default = ["blob", "queue", "table", "file"]
+  description = "Configuration for Datastorages"
+  type        = list(string)
+  default     = ["blob", "queue", "table", "file"]
 }
 
 variable "management_policy_enable" {
