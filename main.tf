@@ -19,7 +19,7 @@ module "labels" {
 ##-----------------------------------------------------------------------------------------------------
 resource "azurerm_storage_account" "storage" {
   count                             = var.enabled ? 1 : 0
-  name                              = substr(lower(replace(var.resource_position_prefix ? format("ast%s", local.name) : format("%sast", local.name), "-", "")), 0, 24)
+  name                              = var.storage_account_name
   resource_group_name               = var.resource_group_name
   location                          = var.location
   account_kind                      = var.account_kind
@@ -292,7 +292,7 @@ resource "azurerm_advanced_threat_protection" "atp" {
 ##------------------------------------------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_container" "container" {
   count                 = var.enabled ? length(var.containers_list) : 0
-  name                  = var.resource_position_prefix ? format("sc-%s", local.name) : format("%s-sc", local.name)
+  name                  = var.containers_list[count.index].name
   storage_account_id    = azurerm_storage_account.storage[0].id
   container_access_type = var.containers_list[count.index].access_type
 }
@@ -303,7 +303,7 @@ resource "azurerm_storage_container" "container" {
 ##---------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_share" "fileshare" {
   count              = var.enabled ? length(var.file_shares) : 0
-  name               = var.resource_position_prefix ? format("sfs-%s", local.name) : format("%s-sfs", local.name)
+  name               = var.file_shares[count.index].name
   storage_account_id = azurerm_storage_account.storage[0].id
   quota              = var.file_shares[count.index].quota
 }
@@ -314,7 +314,7 @@ resource "azurerm_storage_share" "fileshare" {
 ##------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_table" "tables" {
   count                = var.enabled ? length(var.tables) : 0
-  name                 = var.resource_position_prefix ? format("sta%s", replace(local.name, "-", "")) : format("%ssta", replace(local.name, "-", ""))
+  name                 = var.tables[count.index]
   storage_account_name = azurerm_storage_account.storage[0].name
 }
 
@@ -323,9 +323,9 @@ resource "azurerm_storage_table" "tables" {
 ## message-based communication between application components.
 ##---------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_queue" "queues" {
-  count                = var.enabled && var.enable_queue ? length(var.queues) : 0
-  name                 = var.resource_position_prefix ? format("sq-%s", local.name) : format("%s-sq", local.name)
-  storage_account_name = azurerm_storage_account.storage[0].name
+  count              = var.enabled && var.enable_queue ? length(var.queues) : 0
+  name               = var.queues[count.index]
+  storage_account_id = azurerm_storage_account.storage[0].id
 }
 
 ##-------------------------------------------------------------------------------------------------------
@@ -413,11 +413,10 @@ resource "azurerm_monitor_diagnostic_setting" "storage" {
   eventhub_authorization_rule_id = var.eventhub_authorization_rule_id
   log_analytics_workspace_id     = var.log_analytics_workspace_id
 
-  dynamic "metric" {
+  dynamic "enabled_metric" {
     for_each = var.metrics
     content {
-      category = metric.value
-      enabled  = var.metrics_enabled[metric.key]
+      category = enabled_metric.value
     }
   }
 }
@@ -442,11 +441,10 @@ resource "azurerm_monitor_diagnostic_setting" "datastorage" {
     }
   }
 
-  dynamic "metric" {
+  dynamic "enabled_metric" {
     for_each = var.metrics
     content {
-      category = metric.value
-      enabled  = true
+      category = enabled_metric.value
     }
   }
 }
@@ -464,11 +462,10 @@ resource "azurerm_monitor_diagnostic_setting" "storage-nic" {
   eventhub_authorization_rule_id = var.eventhub_authorization_rule_id
   log_analytics_workspace_id     = var.log_analytics_workspace_id
   log_analytics_destination_type = var.log_analytics_destination_type
-  dynamic "metric" {
+  dynamic "enabled_metric" {
     for_each = var.metrics
     content {
-      category = metric.value
-      enabled  = true
+      category = enabled_metric.value
     }
   }
 
@@ -496,11 +493,10 @@ resource "azurerm_monitor_diagnostic_setting" "storage_blob" {
     }
   }
 
-  dynamic "metric" {
+  dynamic "enabled_metric" {
     for_each = var.blob_metrics
     content {
-      category = metric.value
-      enabled  = true
+      category = enabled_metric.value
     }
   }
 }
@@ -524,11 +520,10 @@ resource "azurerm_monitor_diagnostic_setting" "storage_table" {
     }
   }
 
-  dynamic "metric" {
+  dynamic "enabled_metric" {
     for_each = var.table_metrics
     content {
-      category = metric.value
-      enabled  = true
+      category = enabled_metric.value
     }
   }
 }
@@ -552,11 +547,10 @@ resource "azurerm_monitor_diagnostic_setting" "storage_queue" {
     }
   }
 
-  dynamic "metric" {
+  dynamic "enabled_metric" {
     for_each = var.queue_metrics
     content {
-      category = metric.value
-      enabled  = true
+      category = enabled_metric.value
     }
   }
 }
@@ -580,11 +574,10 @@ resource "azurerm_monitor_diagnostic_setting" "storage_file" {
     }
   }
 
-  dynamic "metric" {
+  dynamic "enabled_metric" {
     for_each = var.file_metrics
     content {
-      category = metric.value
-      enabled  = true
+      category = enabled_metric.value
     }
   }
 }

@@ -19,8 +19,7 @@ module "resource_group" {
 ##-----------------------------------------------------------------------------
 module "storage" {
   source                   = "../.."
-  name                     = "staticweb"
-  environment              = "prod"
+  storage_account_name     = "staticwebsitestorage"
   resource_group_name      = module.resource_group.resource_group_name
   location                 = module.resource_group.resource_group_location
   account_kind             = "StorageV2"

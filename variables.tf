@@ -68,6 +68,27 @@ variable "deployment_mode" {
 ##-----------------------------------------------------------------------------
 ## Storage Account
 ##-----------------------------------------------------------------------------
+variable "storage_account_name" {
+  type        = string
+  default     = null
+  description = "Name of the Azure Storage Account. Must be globally unique, 3-24 characters long, and contain only lowercase letters and numbers."
+
+  validation {
+    condition     = length(var.storage_account_name) >= 3 && length(var.storage_account_name) <= 24
+    error_message = "Storage account name must be between 3 and 24 characters in length."
+  }
+
+  validation {
+    condition     = can(regex("^[a-z0-9]+$", var.storage_account_name))
+    error_message = "Storage account name can only contain lowercase letters and numbers. No hyphens, underscores, or special characters allowed."
+  }
+
+  validation {
+    condition     = can(regex("^[a-z0-9]", var.storage_account_name)) && can(regex("[a-z0-9]$", var.storage_account_name))
+    error_message = "Storage account name must start and end with a lowercase letter or number."
+  }
+}
+
 variable "enabled" {
   type        = bool
   description = "Set to false to prevent the module from creating any resources."
@@ -723,11 +744,6 @@ variable "log_analytics_workspace_id" {
 variable "metrics" {
   type    = list(string)
   default = ["Transaction", "Capacity"]
-}
-
-variable "metrics_enabled" {
-  type    = list(bool)
-  default = [true, true]
 }
 
 variable "logs" {

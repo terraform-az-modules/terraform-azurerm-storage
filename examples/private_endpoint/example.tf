@@ -77,9 +77,7 @@ module "private_dns_zone" {
 ##-----------------------------------------------------------------------------
 module "storage" {
   source                        = "../.."
-  name                          = "core"
-  environment                   = "dev"
-  label_order                   = ["name", "environment", "location"]
+  storage_account_name          = "app1storagepvtep"
   resource_group_name           = module.resource_group.resource_group_name
   location                      = module.resource_group.resource_group_location
   public_network_access_enabled = false
