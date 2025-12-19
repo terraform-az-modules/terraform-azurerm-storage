@@ -42,6 +42,7 @@ resource "azurerm_storage_account" "storage" {
   table_encryption_key_type         = var.table_encryption_key_type
   queue_encryption_key_type         = var.queue_encryption_key_type
   allowed_copy_scope                = var.allowed_copy_scope
+  local_user_enabled                = var.local_user_enabled
   tags                              = module.labels.tags
 
   dynamic "blob_properties" {

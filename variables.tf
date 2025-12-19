@@ -161,6 +161,12 @@ variable "public_network_access_enabled" {
   description = "Whether the public network access is enabled? Defaults to true."
 }
 
+variable "local_user_enabled" {
+  type        = bool
+  default     = true
+  description = "Specifies whether local users are enabled for the Storage Account. Defaults to true."
+}
+
 variable "default_to_oauth_authentication" {
   type        = bool
   default     = false
@@ -198,7 +204,14 @@ variable "network_rules" {
     virtual_network_subnet_ids = optional(list(string), [])
     bypass                     = optional(list(string), [])
   }))
-  default     = []
+  default = [
+    {
+      default_action             = "Deny"
+      ip_rules                   = []
+      virtual_network_subnet_ids = []
+      bypass                     = ["AzureServices"]
+    }
+  ]
   description = "List of objects that represent the configuration of each network rule."
 }
 
