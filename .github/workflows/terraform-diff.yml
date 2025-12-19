@@ -7,6 +7,7 @@ on:
 jobs:
 
   basic-example:
+    if: github.actor != 'dependabot[bot]'
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-pr-checks.yaml@master
     with:
       provider: 'azurerm'
@@ -16,7 +17,19 @@ jobs:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
 
+  cmk-enabled-example:
+    if: github.actor != 'dependabot[bot]'
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-pr-checks.yaml@master
+    with:
+      provider: 'azurerm'
+      terraform_directory: 'examples/cmk_enable'
+      target_branch: 'master'
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  
   complete-example:
+    if: github.actor != 'dependabot[bot]'
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-pr-checks.yaml@master
     with:
       provider: 'azurerm'
@@ -26,21 +39,23 @@ jobs:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
 
-  cmk-enabled-example:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-pr-checks.yaml@master
-    with:
-      provider: 'azurerm'
-      terraform_directory: 'examples/cmk_enable'
-      target_branch: 'master'
-    secrets:
-      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-
   private-endpoint-example:
+    if: github.actor != 'dependabot[bot]'
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-pr-checks.yaml@master
     with:
       provider: 'azurerm'
       terraform_directory: 'examples/private_endpoint'
+      target_branch: 'master'
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  
+  static-website-example:
+    if: github.actor != 'dependabot[bot]'
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-pr-checks.yaml@master
+    with:
+      provider: 'azurerm'
+      terraform_directory: 'examples/static_website'
       target_branch: 'master'
     secrets:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
