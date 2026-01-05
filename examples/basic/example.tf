@@ -19,9 +19,7 @@ module "resource_group" {
 ##-----------------------------------------------------------------------------
 module "storage" {
   source                   = "../.."
-  name                     = "app1"
-  environment              = "test"
-  label_order              = ["name", "environment", "location"]
+  storage_account_name     = "app1storageacct"
   resource_group_name      = module.resource_group.resource_group_name
   location                 = module.resource_group.resource_group_location
   account_kind             = "StorageV2"
