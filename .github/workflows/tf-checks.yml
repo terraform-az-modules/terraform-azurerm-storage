@@ -24,6 +24,11 @@ jobs:
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
       working_directory: './examples/private_endpoint/'
+
+  static-website-example:
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
+    with:
+      working_directory: './examples/static_website/'
   
 # Seperate Job for TFlint workflow call
   tf-lint:
