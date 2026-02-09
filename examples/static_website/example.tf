@@ -33,7 +33,7 @@ module "storage" {
   index_document        = "index.html"
 
   # Public access required for static websites
-  public_network_access_enabled   = true
+  public_network_access_enabled   = true # Opt-out: required for internet-facing static website hosting
   allow_nested_items_to_be_public = true
 
   # Disable features not needed for static hosting
