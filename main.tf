@@ -17,14 +17,14 @@ module "labels" {
 ##-----------------------------------------------------------------------------------------------------
 ## Storage Account - Create a Storage account with custormer managed key encryption and its components.  
 ##-----------------------------------------------------------------------------------------------------
-#checkov:skip=CKV_AZURE_206:Replication is configurable via `account_replication_type` (default `LRS`); module consumers choose HA/DR level per workload.
-#checkov:skip=CKV_AZURE_244:Shared key access is configurable for compatibility; consumers should set `shared_access_key_enabled = false` when feasible.
-#checkov:skip=CKV_AZURE_33:Queue logging is configured via `azurerm_storage_account_queue_properties` and related inputs; not all workloads enable queue service.
-#checkov:skip=CKV_AZURE_59:Public network access is securely defaulted to false but remains configurable for valid public endpoint scenarios.
-#checkov:skip=CKV_AZURE_190:Public blob/container exposure is controlled via inputs (`allow_nested_items_to_be_public`, container access types) to preserve module flexibility.
-#checkov:skip=CKV2_AZURE_33:Private endpoint adoption is environment/network-topology dependent and is exposed as optional module functionality.
-#checkov:skip=CKV2_AZURE_40:Shared key authorization is intentionally configurable for legacy compatibility; consumers should disable where possible.
-#checkov:skip=CKV2_AZURE_47:Anonymous blob access is denied by secure default (`allow_nested_items_to_be_public = false`) but remains configurable for edge use-cases.
+# checkov:skip=CKV_AZURE_206:Replication is configurable via `account_replication_type` (default `LRS`); module consumers choose HA/DR level per workload.
+# checkov:skip=CKV_AZURE_244:Shared key access is configurable for compatibility; consumers should set `shared_access_key_enabled = false` when feasible.
+# checkov:skip=CKV_AZURE_33:Queue logging is configured via `azurerm_storage_account_queue_properties` and related inputs; not all workloads enable queue service.
+# checkov:skip=CKV_AZURE_59:Public network access is securely defaulted to false but remains configurable for valid public endpoint scenarios.
+# checkov:skip=CKV_AZURE_190:Public blob/container exposure is controlled via inputs (`allow_nested_items_to_be_public`, container access types) to preserve module flexibility.
+# checkov:skip=CKV2_AZURE_33:Private endpoint adoption is environment/network-topology dependent and is exposed as optional module functionality.
+# checkov:skip=CKV2_AZURE_40:Shared key authorization is intentionally configurable for legacy compatibility; consumers should disable where possible.
+# checkov:skip=CKV2_AZURE_47:Anonymous blob access is denied by secure default (`allow_nested_items_to_be_public = false`) but remains configurable for edge use-cases.
 resource "azurerm_storage_account" "storage" {
   count                             = var.enabled ? 1 : 0
   name                              = substr(lower(replace(var.resource_position_prefix ? format("ast%s", local.name) : format("%sast", local.name), "-", "")), 0, 24)
@@ -242,7 +242,7 @@ resource "azurerm_storage_account_queue_properties" "queue_properties" {
 ##----------------------------------------------------------------------------- 
 ## Key Vault - Creates a key vault that will be used for encryption.  
 ##-----------------------------------------------------------------------------
-#checkov:skip=CKV_AZURE_112:Key type is intentionally configurable (`key_type`) because HSM keys are subscription/cost/context dependent.
+# checkov:skip=CKV_AZURE_112:Key type is intentionally configurable (`key_type`) because HSM keys are subscription/cost/context dependent.
 resource "azurerm_key_vault_key" "kvkey" {
   depends_on      = [azurerm_role_assignment.identity_assigned, azurerm_role_assignment.rbac_keyvault_crypto_officer]
   count           = var.enabled && var.cmk_encryption_enabled ? 1 : 0
@@ -270,8 +270,8 @@ resource "azurerm_key_vault_key" "kvkey" {
 ##--------------------------------------------------------------------------------------
 ## Network Rules - Creates network rules for controlling access and enhancing security.  
 ##--------------------------------------------------------------------------------------
-#checkov:skip=CKV_AZURE_35:Default action remains consumer-configurable for compatibility, with secure default set to `Deny` in variable schema.
-#checkov:skip=CKV_AZURE_36:Bypass is consumer-configurable; secure default includes `AzureServices` while allowing stricter/alternate enterprise policies.
+# checkov:skip=CKV_AZURE_35:Default action remains consumer-configurable for compatibility, with secure default set to `Deny` in variable schema.
+# checkov:skip=CKV_AZURE_36:Bypass is consumer-configurable; secure default includes `AzureServices` while allowing stricter/alternate enterprise policies.
 resource "azurerm_storage_account_network_rules" "network-rules" {
   for_each                   = var.enabled && var.enable_network_rules ? { for i, rule in var.network_rules : i => rule } : {}
   storage_account_id         = azurerm_storage_account.storage[0].id
@@ -301,8 +301,8 @@ resource "azurerm_advanced_threat_protection" "atp" {
 ##------------------------------------------------------------------------------------------------------------------------------------------
 ## Storage Container - Defines a container within the storage account to store blobs (objects) such as logs, data files, or media.
 ##------------------------------------------------------------------------------------------------------------------------------------------
-#checkov:skip=CKV2_AZURE_21:Blob service logging strategy is environment-specific (centralized diagnostics/workspace targets) and configured by module consumers.
-#checkov:skip=CKV2_AZURE_8:Container access level is a workload input; consumers must keep log/archive containers private in their implementation.
+# checkov:skip=CKV2_AZURE_21:Blob service logging strategy is environment-specific (centralized diagnostics/workspace targets) and configured by module consumers.
+# checkov:skip=CKV2_AZURE_8:Container access level is a workload input; consumers must keep log/archive containers private in their implementation.
 resource "azurerm_storage_container" "container" {
   count                 = var.enabled ? length(var.containers_list) : 0
   name                  = var.resource_position_prefix ? format("sc-%s", local.name) : format("%s-sc", local.name)
@@ -325,7 +325,7 @@ resource "azurerm_storage_share" "fileshare" {
 ## Storage Table -  Creates an Azure Table within the storage account to provide a NoSQL key-value 
 ## store for structured, non-relational data.  
 ##------------------------------------------------------------------------------------------------------
-#checkov:skip=CKV2_AZURE_20:Table service logging/diagnostics destinations are consumer-specific and configured externally via diagnostics settings.
+# checkov:skip=CKV2_AZURE_20:Table service logging/diagnostics destinations are consumer-specific and configured externally via diagnostics settings.
 resource "azurerm_storage_table" "tables" {
   count                = var.enabled ? length(var.tables) : 0
   name                 = var.resource_position_prefix ? format("sta%s", replace(local.name, "-", "")) : format("%ssta", replace(local.name, "-", ""))
@@ -336,7 +336,7 @@ resource "azurerm_storage_table" "tables" {
 ## Storage Queue - Creates an Azure Storage Queue within the storage account to support asynchronous 
 ## message-based communication between application components.
 ##---------------------------------------------------------------------------------------------------------
-#checkov:skip=CKV2_AZURE_20:Queue/Table logging enforcement depends on centralized observability design and is left to consumer configuration.
+# checkov:skip=CKV2_AZURE_20:Queue/Table logging enforcement depends on centralized observability design and is left to consumer configuration.
 resource "azurerm_storage_queue" "queues" {
   count                = var.enabled && var.enable_queue ? length(var.queues) : 0
   name                 = var.resource_position_prefix ? format("sq-%s", local.name) : format("%s-sq", local.name)
