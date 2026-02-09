@@ -151,7 +151,7 @@ This table contains both Prerequisites and Providers:
 | <a name="input_nfsv3_enabled"></a> [nfsv3\_enabled](#input\_nfsv3\_enabled) | Is NFSv3 protocol enabled? Changing this forces a new resource to be created. | `bool` | `false` | no |
 | <a name="input_private_dns_zone_ids"></a> [private\_dns\_zone\_ids](#input\_private\_dns\_zone\_ids) | The IDs of a private DNS zone. | `string` | `null` | no |
 | <a name="input_private_link_access"></a> [private\_link\_access](#input\_private\_link\_access) | List of Privatelink objects to allow access from. | <pre>list(object({<br>    endpoint_resource_id = string<br>    endpoint_tenant_id   = string<br>  }))</pre> | `[]` | no |
-| <a name="input_public_network_access_enabled"></a> [public\_network\_access\_enabled](#input\_public\_network\_access\_enabled) | Whether the public network access is enabled? Defaults to true. | `bool` | `true` | no |
+| <a name="input_public_network_access_enabled"></a> [public\_network\_access\_enabled](#input\_public\_network\_access\_enabled) | Whether the public network access is enabled? Defaults to false. | `bool` | `false` | no |
 | <a name="input_queue_encryption_key_type"></a> [queue\_encryption\_key\_type](#input\_queue\_encryption\_key\_type) | The encryption type of the queue service. Possible values are 'Service' and 'Account'. | `string` | `"Account"` | no |
 | <a name="input_queue_logs"></a> [queue\_logs](#input\_queue\_logs) | Log categories for Queue service diagnostics. | `list(string)` | <pre>[<br>  "StorageRead",<br>  "StorageWrite",<br>  "StorageDelete"<br>]</pre> | no |
 | <a name="input_queue_metrics"></a> [queue\_metrics](#input\_queue\_metrics) | Metric categories for Queue service diagnostics. | `list(string)` | <pre>[<br>  "Transaction",<br>  "Capacity"<br>]</pre> | no |
@@ -259,3 +259,9 @@ Write to us at [hello@clouddrove.com](hello@clouddrove.com).
   [email]: <>
   [github]: https://github.com/terraform-az-modules
   [terraform_modules]: https://github.com/orgs/terraform-az-modules/repositories
+
+## Breaking Change: Security Default Hardening
+
+This module version introduces a breaking change to improve security. `public_network_access_enabled` now defaults to `false`, disabling public access by default.
+
+If you relied on the previous default (`true`), explicitly set `public_network_access_enabled = true` to maintain public access.

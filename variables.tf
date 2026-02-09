@@ -136,8 +136,8 @@ variable "infrastructure_encryption_enabled" {
 
 variable "public_network_access_enabled" {
   type        = bool
-  default     = true
-  description = "Whether the public network access is enabled? Defaults to true."
+  default     = false
+  description = "Whether the public network access is enabled? Defaults to false."
 }
 
 variable "default_to_oauth_authentication" {
