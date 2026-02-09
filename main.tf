@@ -23,6 +23,9 @@ resource "azurerm_storage_account" "storage" {
   #checkov:skip=CKV_AZURE_33:Queue logging is configured via `azurerm_storage_account_queue_properties` and related inputs; not all workloads enable queue service.
   #checkov:skip=CKV_AZURE_59:Public network access is securely defaulted to false but remains configurable for valid public endpoint scenarios.
   #checkov:skip=CKV_AZURE_190:Public blob/container exposure is controlled via inputs (`allow_nested_items_to_be_public`, container access types) to preserve module flexibility.
+  #checkov:skip=CKV2_AZURE_33:Private endpoint adoption is environment/network-topology dependent and is exposed as optional module functionality.
+  #checkov:skip=CKV2_AZURE_40:Shared key authorization is intentionally configurable for legacy compatibility; consumers should disable where possible.
+  #checkov:skip=CKV2_AZURE_47:Anonymous blob access is denied by secure default (`allow_nested_items_to_be_public = false`) but remains configurable for edge use-cases.
   count                             = var.enabled ? 1 : 0
   name                              = substr(lower(replace(var.resource_position_prefix ? format("ast%s", local.name) : format("%sast", local.name), "-", "")), 0, 24)
   resource_group_name               = var.resource_group_name
@@ -300,6 +303,7 @@ resource "azurerm_advanced_threat_protection" "atp" {
 ##------------------------------------------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_container" "container" {
   #checkov:skip=CKV2_AZURE_21:Blob service logging strategy is environment-specific (centralized diagnostics/workspace targets) and configured by module consumers.
+  #checkov:skip=CKV2_AZURE_8:Container access level is a workload input; consumers must keep log/archive containers private in their implementation.
   count                 = var.enabled ? length(var.containers_list) : 0
   name                  = var.resource_position_prefix ? format("sc-%s", local.name) : format("%s-sc", local.name)
   storage_account_id    = azurerm_storage_account.storage[0].id
@@ -322,6 +326,7 @@ resource "azurerm_storage_share" "fileshare" {
 ## store for structured, non-relational data.  
 ##------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_table" "tables" {
+  #checkov:skip=CKV2_AZURE_20:Table service logging/diagnostics destinations are consumer-specific and configured externally via diagnostics settings.
   count                = var.enabled ? length(var.tables) : 0
   name                 = var.resource_position_prefix ? format("sta%s", replace(local.name, "-", "")) : format("%ssta", replace(local.name, "-", ""))
   storage_account_name = azurerm_storage_account.storage[0].name
@@ -332,6 +337,7 @@ resource "azurerm_storage_table" "tables" {
 ## message-based communication between application components.
 ##---------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_queue" "queues" {
+  #checkov:skip=CKV2_AZURE_20:Queue/Table logging enforcement depends on centralized observability design and is left to consumer configuration.
   count                = var.enabled && var.enable_queue ? length(var.queues) : 0
   name                 = var.resource_position_prefix ? format("sq-%s", local.name) : format("%s-sq", local.name)
   storage_account_name = azurerm_storage_account.storage[0].name

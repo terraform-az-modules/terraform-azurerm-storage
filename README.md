@@ -274,4 +274,4 @@ This module applies secure defaults where possible while keeping behavior config
 - Nested public blob access defaults to `false`.
 - Network rules support secure defaults (`default_action = "Deny"`, `bypass = ["AzureServices"]`).
 
-Some controls remain intentionally consumer-driven and may require explicit configuration in consuming stacks (for example: private endpoints, centralized logging destinations, replication tier, HSM key usage, and shared key access policy).
+Some controls remain intentionally consumer-driven and may require explicit configuration in consuming stacks (for example: private endpoints, centralized logging destinations across blob/queue/table services, replication tier, HSM key usage, and shared key access policy).
