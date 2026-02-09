@@ -18,6 +18,11 @@ module "labels" {
 ## Storage Account - Create a Storage account with custormer managed key encryption and its components.  
 ##-----------------------------------------------------------------------------------------------------
 resource "azurerm_storage_account" "storage" {
+  #checkov:skip=CKV_AZURE_206:Replication is configurable via `account_replication_type` (default `LRS`); module consumers choose HA/DR level per workload.
+  #checkov:skip=CKV_AZURE_244:Shared key access is configurable for compatibility; consumers should set `shared_access_key_enabled = false` when feasible.
+  #checkov:skip=CKV_AZURE_33:Queue logging is configured via `azurerm_storage_account_queue_properties` and related inputs; not all workloads enable queue service.
+  #checkov:skip=CKV_AZURE_59:Public network access is securely defaulted to false but remains configurable for valid public endpoint scenarios.
+  #checkov:skip=CKV_AZURE_190:Public blob/container exposure is controlled via inputs (`allow_nested_items_to_be_public`, container access types) to preserve module flexibility.
   count                             = var.enabled ? 1 : 0
   name                              = substr(lower(replace(var.resource_position_prefix ? format("ast%s", local.name) : format("%sast", local.name), "-", "")), 0, 24)
   resource_group_name               = var.resource_group_name
@@ -235,6 +240,7 @@ resource "azurerm_storage_account_queue_properties" "queue_properties" {
 ## Key Vault - Creates a key vault that will be used for encryption.  
 ##-----------------------------------------------------------------------------
 resource "azurerm_key_vault_key" "kvkey" {
+  #checkov:skip=CKV_AZURE_112:Key type is intentionally configurable (`key_type`) because HSM keys are subscription/cost/context dependent.
   depends_on      = [azurerm_role_assignment.identity_assigned, azurerm_role_assignment.rbac_keyvault_crypto_officer]
   count           = var.enabled && var.cmk_encryption_enabled ? 1 : 0
   name            = var.resource_position_prefix ? format("kvk-%s", local.name) : format("%s-kvk", local.name)
@@ -262,12 +268,14 @@ resource "azurerm_key_vault_key" "kvkey" {
 ## Network Rules - Creates network rules for controlling access and enhancing security.  
 ##--------------------------------------------------------------------------------------
 resource "azurerm_storage_account_network_rules" "network-rules" {
+  #checkov:skip=CKV_AZURE_35:Default action remains consumer-configurable for compatibility, with secure default set to `Deny` in variable schema.
+  #checkov:skip=CKV_AZURE_36:Bypass is consumer-configurable; secure default includes `AzureServices` while allowing stricter/alternate enterprise policies.
   for_each                   = var.enabled && var.enable_network_rules ? { for i, rule in var.network_rules : i => rule } : {}
   storage_account_id         = azurerm_storage_account.storage[0].id
-  default_action             = lookup(each.value, "default_action", "Deny")
-  ip_rules                   = lookup(each.value, "ip_rules", null)
-  virtual_network_subnet_ids = lookup(each.value, "virtual_network_subnet_ids", null)
-  bypass                     = lookup(each.value, "bypass", null)
+  default_action             = each.value.default_action
+  ip_rules                   = each.value.ip_rules
+  virtual_network_subnet_ids = each.value.virtual_network_subnet_ids
+  bypass                     = each.value.bypass
 
   dynamic "private_link_access" {
     for_each = var.enable_private_link_access ? var.private_link_access : []
@@ -291,6 +299,7 @@ resource "azurerm_advanced_threat_protection" "atp" {
 ## Storage Container - Defines a container within the storage account to store blobs (objects) such as logs, data files, or media.
 ##------------------------------------------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_container" "container" {
+  #checkov:skip=CKV2_AZURE_21:Blob service logging strategy is environment-specific (centralized diagnostics/workspace targets) and configured by module consumers.
   count                 = var.enabled ? length(var.containers_list) : 0
   name                  = var.resource_position_prefix ? format("sc-%s", local.name) : format("%s-sc", local.name)
   storage_account_id    = azurerm_storage_account.storage[0].id

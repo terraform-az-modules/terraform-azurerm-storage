@@ -84,7 +84,7 @@ This table contains both Prerequisites and Providers:
 | <a name="input_account_tier"></a> [account\_tier](#input\_account\_tier) | Defines the Tier to use for this storage account. | `string` | `"Standard"` | no |
 | <a name="input_admin_objects_ids"></a> [admin\_objects\_ids](#input\_admin\_objects\_ids) | IDs of the objects that can do all operations on all keys, secrets and certificates. | `list(string)` | `[]` | no |
 | <a name="input_alias_sub"></a> [alias\_sub](#input\_alias\_sub) | n/a | `string` | `null` | no |
-| <a name="input_allow_nested_items_to_be_public"></a> [allow\_nested\_items\_to\_be\_public](#input\_allow\_nested\_items\_to\_be\_public) | Allow or disallow nested items within this Account to opt into being public. Defaults to true. | `bool` | `false` | no |
+| <a name="input_allow_nested_items_to_be_public"></a> [allow\_nested\_items\_to\_be\_public](#input\_allow\_nested\_items\_to\_be\_public) | Allow or disallow nested items within this Account to opt into being public. Defaults to false. | `bool` | `false` | no |
 | <a name="input_allowed_copy_scope"></a> [allowed\_copy\_scope](#input\_allowed\_copy\_scope) | Restrict copy to and from Storage Accounts within an AAD tenant or with Private Links to the same VNet. Possible values are AAD and PrivateLink. | `string` | `"PrivateLink"` | no |
 | <a name="input_blob_logs"></a> [blob\_logs](#input\_blob\_logs) | Log categories for Blob service diagnostics. | `list(string)` | <pre>[<br>  "StorageRead",<br>  "StorageWrite",<br>  "StorageDelete"<br>]</pre> | no |
 | <a name="input_blob_metrics"></a> [blob\_metrics](#input\_blob\_metrics) | Metric categories for Blob service diagnostics. | `list(string)` | <pre>[<br>  "Transaction",<br>  "Capacity"<br>]</pre> | no |
@@ -128,7 +128,7 @@ This table contains both Prerequisites and Providers:
 | <a name="input_file_shares"></a> [file\_shares](#input\_file\_shares) | List of containers to create and their access levels. | `list(object({ name = string, quota = number }))` | `[]` | no |
 | <a name="input_hour_metrics"></a> [hour\_metrics](#input\_hour\_metrics) | n/a | <pre>object({<br>    enabled               = bool<br>    version               = string<br>    include_apis          = bool<br>    retention_policy_days = number<br>  })</pre> | <pre>{<br>  "enabled": false,<br>  "include_apis": false,<br>  "retention_policy_days": 7,<br>  "version": ""<br>}</pre> | no |
 | <a name="input_identity_type"></a> [identity\_type](#input\_identity\_type) | Specifies the type of Managed Service Identity that should be configured on this Storage Account. Possible values are `SystemAssigned`, `UserAssigned`, `SystemAssigned, UserAssigned` (to enable both). | `string` | `"UserAssigned"` | no |
-| <a name="input_infrastructure_encryption_enabled"></a> [infrastructure\_encryption\_enabled](#input\_infrastructure\_encryption\_enabled) | Is infrastructure encryption enabled? Changing this forces a new resource to be created. Defaults to false. | `bool` | `true` | no |
+| <a name="input_infrastructure_encryption_enabled"></a> [infrastructure\_encryption\_enabled](#input\_infrastructure\_encryption\_enabled) | Is infrastructure encryption enabled? Changing this forces a new resource to be created. Defaults to true. | `bool` | `true` | no |
 | <a name="input_is_hns_enabled"></a> [is\_hns\_enabled](#input\_is\_hns\_enabled) | Is Hierarchical Namespace enabled? This can be used with Azure Data Lake Storage Gen 2. Changing this forces a new resource to be created. | `bool` | `false` | no |
 | <a name="input_key_vault_id"></a> [key\_vault\_id](#input\_key\_vault\_id) | n/a | `string` | `""` | no |
 | <a name="input_key_vault_rbac_auth_enabled"></a> [key\_vault\_rbac\_auth\_enabled](#input\_key\_vault\_rbac\_auth\_enabled) | Is key vault has role base access enable or not. | `bool` | `true` | no |
@@ -147,7 +147,7 @@ This table contains both Prerequisites and Providers:
 | <a name="input_minute_metrics"></a> [minute\_metrics](#input\_minute\_metrics) | n/a | <pre>list(object({<br>    enabled               = bool<br>    version               = string<br>    include_apis          = bool<br>    retention_policy_days = number<br>  }))</pre> | <pre>[<br>  {<br>    "enabled": false,<br>    "include_apis": false,<br>    "retention_policy_days": 7,<br>    "version": ""<br>  }<br>]</pre> | no |
 | <a name="input_multi_sub_vnet_link"></a> [multi\_sub\_vnet\_link](#input\_multi\_sub\_vnet\_link) | Flag to control creation of vnet link for dns zone in different subscription | `bool` | `false` | no |
 | <a name="input_name"></a> [name](#input\_name) | Name  (e.g. `app` or `cluster`). | `string` | `""` | no |
-| <a name="input_network_rules"></a> [network\_rules](#input\_network\_rules) | List of objects that represent the configuration of each network rule. | <pre>list(object({<br>    default_action             = string<br>    ip_rules                   = list(string)<br>    virtual_network_subnet_ids = optional(list(string), [])<br>    bypass                     = optional(list(string), [])<br>  }))</pre> | `[]` | no |
+| <a name="input_network_rules"></a> [network\_rules](#input\_network\_rules) | List of objects that represent the configuration of each network rule. Secure defaults are default_action='Deny' and bypass=['AzureServices']. | <pre>list(object({<br>    default_action             = optional(string, "Deny")<br>    ip_rules                   = optional(list(string), [])<br>    virtual_network_subnet_ids = optional(list(string), [])<br>    bypass                     = optional(list(string), ["AzureServices"])<br>  }))</pre> | `[]` | no |
 | <a name="input_nfsv3_enabled"></a> [nfsv3\_enabled](#input\_nfsv3\_enabled) | Is NFSv3 protocol enabled? Changing this forces a new resource to be created. | `bool` | `false` | no |
 | <a name="input_private_dns_zone_ids"></a> [private\_dns\_zone\_ids](#input\_private\_dns\_zone\_ids) | The IDs of a private DNS zone. | `string` | `null` | no |
 | <a name="input_private_link_access"></a> [private\_link\_access](#input\_private\_link\_access) | List of Privatelink objects to allow access from. | <pre>list(object({<br>    endpoint_resource_id = string<br>    endpoint_tenant_id   = string<br>  }))</pre> | `[]` | no |
@@ -265,3 +265,13 @@ Write to us at [hello@clouddrove.com](hello@clouddrove.com).
 This module version introduces a breaking change to improve security. `public_network_access_enabled` now defaults to `false`, disabling public access by default.
 
 If you relied on the previous default (`true`), explicitly set `public_network_access_enabled = true` to maintain public access.
+
+### Security scan notes (Checkov)
+
+This module applies secure defaults where possible while keeping behavior configurable for different enterprise environments:
+
+- Public network access defaults to `false`.
+- Nested public blob access defaults to `false`.
+- Network rules support secure defaults (`default_action = "Deny"`, `bypass = ["AzureServices"]`).
+
+Some controls remain intentionally consumer-driven and may require explicit configuration in consuming stacks (for example: private endpoints, centralized logging destinations, replication tier, HSM key usage, and shared key access policy).

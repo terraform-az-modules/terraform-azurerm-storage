@@ -131,7 +131,7 @@ variable "shared_access_key_enabled" {
 variable "infrastructure_encryption_enabled" {
   type        = bool
   default     = true
-  description = " Is infrastructure encryption enabled? Changing this forces a new resource to be created. Defaults to false."
+  description = "Is infrastructure encryption enabled? Changing this forces a new resource to be created. Defaults to true."
 }
 
 variable "public_network_access_enabled" {
@@ -155,7 +155,7 @@ variable "cross_tenant_replication_enabled" {
 variable "allow_nested_items_to_be_public" {
   type        = bool
   default     = false
-  description = "Allow or disallow nested items within this Account to opt into being public. Defaults to true."
+  description = "Allow or disallow nested items within this Account to opt into being public. Defaults to false."
 }
 
 variable "allowed_copy_scope" {
@@ -172,13 +172,13 @@ variable "containers_list" {
 
 variable "network_rules" {
   type = list(object({
-    default_action             = string
-    ip_rules                   = list(string)
+    default_action             = optional(string, "Deny")
+    ip_rules                   = optional(list(string), [])
     virtual_network_subnet_ids = optional(list(string), [])
-    bypass                     = optional(list(string), [])
+    bypass                     = optional(list(string), ["AzureServices"])
   }))
   default     = []
-  description = "List of objects that represent the configuration of each network rule."
+  description = "List of objects that represent the configuration of each network rule. Secure defaults are default_action='Deny' and bypass=['AzureServices']."
 }
 
 variable "table_encryption_key_type" {
