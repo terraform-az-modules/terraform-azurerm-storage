@@ -6,27 +6,27 @@ on:
   workflow_dispatch:
 jobs:
   basic-example:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@88efd7724e007c8f721a219498be29e0c9ad471b
     with:
       working_directory: './examples/basic/'
 
   cmk-enabled-example:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@88efd7724e007c8f721a219498be29e0c9ad471b
     with:
       working_directory: './examples/cmk_enable/'
 
   complete-example:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@88efd7724e007c8f721a219498be29e0c9ad471b
     with:
       working_directory: './examples/complete/'
 
   private-endpoint-example:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@88efd7724e007c8f721a219498be29e0c9ad471b
     with:
       working_directory: './examples/private_endpoint/'
   
 # Seperate Job for TFlint workflow call
   tf-lint:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-lint.yml@master
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-lint.yml@88efd7724e007c8f721a219498be29e0c9ad471b
     secrets:
       GITHUB: ${{ secrets.GITHUB }}
