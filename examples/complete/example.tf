@@ -71,7 +71,7 @@ module "log-analytics" {
 # ------------------------------------------------------------------------------
 module "vault" {
   source                        = "terraform-az-modules/key-vault/azurerm"
-  version                       = "1.0.1"
+  version                       = "1.1.0"
   name                          = "core"
   environment                   = "qa"
   label_order                   = ["name", "environment", "location"]
