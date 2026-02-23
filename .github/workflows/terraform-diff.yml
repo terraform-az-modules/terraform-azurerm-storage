@@ -7,7 +7,7 @@ on:
 jobs:
 
   basic-example:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-pr-checks.yaml@88efd7724e007c8f721a219498be29e0c9ad471b
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-pr-checks.yaml@master
     with:
       provider: 'azurerm'
       terraform_directory: 'examples/basic'
@@ -17,7 +17,7 @@ jobs:
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
 
   complete-example:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-pr-checks.yaml@88efd7724e007c8f721a219498be29e0c9ad471b
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-pr-checks.yaml@master
     with:
       provider: 'azurerm'
       terraform_directory: 'examples/complete'
@@ -27,7 +27,7 @@ jobs:
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
 
   cmk-enabled-example:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-pr-checks.yaml@88efd7724e007c8f721a219498be29e0c9ad471b
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-pr-checks.yaml@master
     with:
       provider: 'azurerm'
       terraform_directory: 'examples/cmk_enable'
@@ -37,7 +37,7 @@ jobs:
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
 
   private-endpoint-example:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-pr-checks.yaml@88efd7724e007c8f721a219498be29e0c9ad471b
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-pr-checks.yaml@master
     with:
       provider: 'azurerm'
       terraform_directory: 'examples/private_endpoint'

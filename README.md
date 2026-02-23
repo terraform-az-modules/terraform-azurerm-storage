@@ -259,19 +259,3 @@ Write to us at [hello@clouddrove.com](hello@clouddrove.com).
   [email]: <>
   [github]: https://github.com/terraform-az-modules
   [terraform_modules]: https://github.com/orgs/terraform-az-modules/repositories
-
-## Breaking Change: Security Default Hardening
-
-This module version introduces a breaking change to improve security. `public_network_access_enabled` now defaults to `false`, disabling public access by default.
-
-If you relied on the previous default (`true`), explicitly set `public_network_access_enabled = true` to maintain public access.
-
-### Security scan notes (Checkov)
-
-This module applies secure defaults where possible while keeping behavior configurable for different enterprise environments:
-
-- Public network access defaults to `false`.
-- Nested public blob access defaults to `false`.
-- Network rules support secure defaults (`default_action = "Deny"`, `bypass = ["AzureServices"]`).
-
-Some controls remain intentionally consumer-driven and may require explicit configuration in consuming stacks (for example: private endpoints, centralized logging destinations across blob/queue/table services, replication tier, HSM key usage, and shared key access policy).
