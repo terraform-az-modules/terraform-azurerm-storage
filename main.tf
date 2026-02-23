@@ -264,10 +264,10 @@ resource "azurerm_key_vault_key" "kvkey" {
 resource "azurerm_storage_account_network_rules" "network-rules" {
   for_each                   = var.enabled && var.enable_network_rules ? { for i, rule in var.network_rules : i => rule } : {}
   storage_account_id         = azurerm_storage_account.storage[0].id
-  default_action             = lookup(each.value, "default_action", "Deny")
-  ip_rules                   = lookup(each.value, "ip_rules", null)
-  virtual_network_subnet_ids = lookup(each.value, "virtual_network_subnet_ids", null)
-  bypass                     = lookup(each.value, "bypass", null)
+  default_action             = each.value.default_action
+  ip_rules                   = each.value.ip_rules
+  virtual_network_subnet_ids = each.value.virtual_network_subnet_ids
+  bypass                     = each.value.bypass
 
   dynamic "private_link_access" {
     for_each = var.enable_private_link_access ? var.private_link_access : []

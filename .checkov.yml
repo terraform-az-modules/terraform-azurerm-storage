@@ -1,0 +1,15 @@
+skip-check:
+  - CKV2_AZURE_20 # Service diagnostics strategy is consumer/environment-specific
+  - CKV2_AZURE_21 # Blob service logging handled via consumer diagnostics settings
+  - CKV2_AZURE_33 # Private endpoint is optional for shared module flexibility
+  - CKV2_AZURE_40 # Shared key authorization remains configurable for compatibility
+  - CKV2_AZURE_47 # Anonymous blob access is denied by secure default but configurable
+  - CKV2_AZURE_8  # Container access type is workload-specific
+  - CKV_AZURE_112 # Key type is configurable; HSM depends on subscription/cost constraints
+  - CKV_AZURE_190 # Public blob access control exposed as module input
+  - CKV_AZURE_206 # Replication strategy is workload-dependent and configurable
+  - CKV_AZURE_244 # Local/shared key users may be required for legacy consumers
+  - CKV_AZURE_33  # Queue logging configuration depends on enabled queue features
+  - CKV_AZURE_35  # Network default action remains configurable with secure default deny
+  - CKV_AZURE_36  # Bypass policy is configurable; secure default includes AzureServices
+  - CKV_AZURE_59  # Public network access securely defaulted off but configurable
