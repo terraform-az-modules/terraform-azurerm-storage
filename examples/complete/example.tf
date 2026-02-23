@@ -78,7 +78,7 @@ module "vault" {
   resource_group_name           = module.resource_group.resource_group_name
   location                      = module.resource_group.resource_group_location
   subnet_id                     = module.subnet.subnet_ids.subnet1
-  public_network_access_enabled = true
+  public_network_access_enabled = false
   enable_private_endpoint       = false
   sku_name                      = "standard"
   network_acls = {
@@ -105,14 +105,14 @@ module "storage" {
   label_order                   = ["name", "environment", "location"]
   resource_group_name           = module.resource_group.resource_group_name
   location                      = module.resource_group.resource_group_location
-  public_network_access_enabled = true
+  public_network_access_enabled = false
   account_kind                  = "StorageV2"
   account_tier                  = "Standard"
   admin_objects_ids             = [data.azurerm_client_config.current_client_config.object_id]
   network_rules = [
     {
       default_action             = "Deny"
-      ip_rules                   = ["0.0.0.0/0"]
+      ip_rules                   = []
       virtual_network_subnet_ids = []
       bypass                     = ["AzureServices"]
   }]

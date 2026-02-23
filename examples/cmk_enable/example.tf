@@ -27,7 +27,7 @@ module "vault" {
   label_order                   = ["name", "environment", "location"]
   resource_group_name           = module.resource_group.resource_group_name
   location                      = module.resource_group.resource_group_location
-  public_network_access_enabled = true
+  public_network_access_enabled = false
   sku_name                      = "standard"
   reader_objects_ids = {
     "Key Vault Administrator" = {
@@ -49,7 +49,7 @@ module "storage" {
   label_order                   = ["name", "environment", "location"]
   resource_group_name           = module.resource_group.resource_group_name
   location                      = module.resource_group.resource_group_location
-  public_network_access_enabled = true
+  public_network_access_enabled = false
   account_kind                  = "StorageV2"
   account_tier                  = "Standard"
   admin_objects_ids             = [data.azurerm_client_config.current_client_config.object_id]
