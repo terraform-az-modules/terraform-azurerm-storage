@@ -68,6 +68,27 @@ variable "deployment_mode" {
 ##-----------------------------------------------------------------------------
 ## Storage Account
 ##-----------------------------------------------------------------------------
+variable "storage_account_name" {
+  type        = string
+  default     = null
+  description = "Name of the Azure Storage Account. Must be globally unique, 3-24 characters long, and contain only lowercase letters and numbers."
+
+  validation {
+    condition     = length(var.storage_account_name) >= 3 && length(var.storage_account_name) <= 24
+    error_message = "Storage account name must be between 3 and 24 characters in length."
+  }
+
+  validation {
+    condition     = can(regex("^[a-z0-9]+$", var.storage_account_name))
+    error_message = "Storage account name can only contain lowercase letters and numbers. No hyphens, underscores, or special characters allowed."
+  }
+
+  validation {
+    condition     = can(regex("^[a-z0-9]", var.storage_account_name)) && can(regex("[a-z0-9]$", var.storage_account_name))
+    error_message = "Storage account name must start and end with a lowercase letter or number."
+  }
+}
+
 variable "enabled" {
   type        = bool
   description = "Set to false to prevent the module from creating any resources."
@@ -140,6 +161,12 @@ variable "public_network_access_enabled" {
   description = "Whether the public network access is enabled? Defaults to true."
 }
 
+variable "local_user_enabled" {
+  type        = bool
+  default     = true
+  description = "Specifies whether local users are enabled for the Storage Account. Defaults to true."
+}
+
 variable "default_to_oauth_authentication" {
   type        = bool
   default     = false
@@ -177,7 +204,14 @@ variable "network_rules" {
     virtual_network_subnet_ids = optional(list(string), [])
     bypass                     = optional(list(string), [])
   }))
-  default     = []
+  default = [
+    {
+      default_action             = "Deny"
+      ip_rules                   = []
+      virtual_network_subnet_ids = []
+      bypass                     = ["AzureServices"]
+    }
+  ]
   description = "List of objects that represent the configuration of each network rule."
 }
 
@@ -723,11 +757,6 @@ variable "log_analytics_workspace_id" {
 variable "metrics" {
   type    = list(string)
   default = ["Transaction", "Capacity"]
-}
-
-variable "metrics_enabled" {
-  type    = list(bool)
-  default = [true, true]
 }
 
 variable "logs" {
