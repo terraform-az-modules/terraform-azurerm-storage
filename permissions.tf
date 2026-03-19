@@ -4,7 +4,7 @@
 resource "azurerm_user_assigned_identity" "identity" {
   count               = var.enabled && var.cmk_encryption_enabled ? 1 : 0
   location            = var.location
-  name                = var.resource_position_prefix ? format("st-mid-%s", local.name) : format("%s-mid-st", local.name)
+  name                = var.resource_position_prefix ? format("mid-st-%s", local.name) : format("%s-st-mid", local.name)
   resource_group_name = var.resource_group_name
   tags                = module.labels.tags
 }
