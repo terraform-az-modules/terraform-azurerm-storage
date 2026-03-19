@@ -238,7 +238,7 @@ resource "azurerm_storage_account_queue_properties" "queue_properties" {
 resource "azurerm_key_vault_key" "kvkey" {
   depends_on      = [azurerm_role_assignment.identity_assigned, azurerm_role_assignment.rbac_keyvault_crypto_officer]
   count           = var.enabled && var.cmk_encryption_enabled ? 1 : 0
-  name            = var.resource_position_prefix ? format("kvk-%s", local.name) : format("%s-kvk", local.name)
+  name            = var.resource_position_prefix ? format("cmk-key-st-%s", local.name) : format("%s-cmk-key-st", local.name)
   expiration_date = var.expiration_date
   key_vault_id    = var.key_vault_id
   key_type        = var.key_type
