@@ -71,9 +71,9 @@ module "private_dns_zone" {
   ]
 }
 
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 ## Storage module call.
-## Here storage account will be deployed with private dns zone. 
+## Here storage account will be deployed with private dns zone.
 ##-----------------------------------------------------------------------------
 module "storage" {
   source                        = "../.."

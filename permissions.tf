@@ -1,5 +1,5 @@
 ##-------------------------------------------------------------------------------------
-## User Assigned Identity - Create user assigned identity in your azure environment.     
+## User Assigned Identity - Create user assigned identity in your azure environment.
 ##-------------------------------------------------------------------------------------
 resource "azurerm_user_assigned_identity" "identity" {
   count               = var.enabled && var.cmk_encryption_enabled ? 1 : 0
@@ -10,7 +10,7 @@ resource "azurerm_user_assigned_identity" "identity" {
 }
 
 ##-----------------------------------------------------------------------------------------------------------------------
-## Below resource will assign 'Key Vault Crypto Service Encryption User' role to user assigned identity created above. 
+## Below resource will assign 'Key Vault Crypto Service Encryption User' role to user assigned identity created above.
 ##-----------------------------------------------------------------------------------------------------------------------
 resource "azurerm_role_assignment" "identity_assigned" {
   depends_on           = [azurerm_user_assigned_identity.identity]
@@ -22,7 +22,7 @@ resource "azurerm_role_assignment" "identity_assigned" {
 
 ##-------------------------------------------------------------------------------------------------------------
 ## Below resource will provide user access on key vault based on role base access in azure environment.
-## if rbac is enabled then below resource will create. 
+## if rbac is enabled then below resource will create.
 ##-------------------------------------------------------------------------------------------------------------
 resource "azurerm_role_assignment" "rbac_keyvault_crypto_officer" {
   for_each = toset(var.key_vault_rbac_auth_enabled && var.enabled && var.cmk_encryption_enabled ? var.admin_objects_ids : [])
@@ -33,7 +33,7 @@ resource "azurerm_role_assignment" "rbac_keyvault_crypto_officer" {
 }
 
 ##-------------------------------------------------------------------------------------------------
-## Key Vault Access Policy - Create access policy for user whose object id will be mentioned. 
+## Key Vault Access Policy - Create access policy for user whose object id will be mentioned.
 ##-------------------------------------------------------------------------------------------------
 resource "azurerm_key_vault_access_policy" "keyvault-access-policy" {
   count        = local.create_key_vault_policy ? 1 : 0

@@ -555,7 +555,7 @@ variable "private_dns_zone_ids" {
 }
 
 ##-----------------------------------------------------------------------------
-## Data Protection 
+## Data Protection
 ##-----------------------------------------------------------------------------
 variable "storage_blob_data_protection" {
   description = "Storage account blob Data protection parameters."

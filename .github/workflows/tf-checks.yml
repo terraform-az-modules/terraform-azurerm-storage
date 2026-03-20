@@ -34,7 +34,7 @@ jobs:
     with:
       working_directory: './examples/static_website/'
       provider: none
-  
+
 # Seperate Job for TFlint workflow call
   tf-lint:
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-lint.yml@master
