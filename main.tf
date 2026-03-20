@@ -15,7 +15,7 @@ module "labels" {
 }
 
 ##-----------------------------------------------------------------------------------------------------
-## Storage Account - Create a Storage account with custormer managed key encryption and its components.  
+## Storage Account - Create a Storage account with custormer managed key encryption and its components.
 ##-----------------------------------------------------------------------------------------------------
 resource "azurerm_storage_account" "storage" {
   count                             = var.enabled ? 1 : 0
@@ -195,7 +195,7 @@ resource "azurerm_storage_account_static_website" "static_website" {
   index_document     = var.index_document
 }
 
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 ## Queue Properties - Create a queue properties for storage account .
 ##-----------------------------------------------------------------------------
 resource "azurerm_storage_account_queue_properties" "queue_properties" {
@@ -232,8 +232,8 @@ resource "azurerm_storage_account_queue_properties" "queue_properties" {
   }
 }
 
-##----------------------------------------------------------------------------- 
-## Key Vault - Creates a key vault that will be used for encryption.  
+##-----------------------------------------------------------------------------
+## Key Vault - Creates a key vault that will be used for encryption.
 ##-----------------------------------------------------------------------------
 resource "azurerm_key_vault_key" "kvkey" {
   depends_on      = [azurerm_role_assignment.identity_assigned, azurerm_role_assignment.rbac_keyvault_crypto_officer]
@@ -260,7 +260,7 @@ resource "azurerm_key_vault_key" "kvkey" {
 }
 
 ##--------------------------------------------------------------------------------------
-## Network Rules - Creates network rules for controlling access and enhancing security.  
+## Network Rules - Creates network rules for controlling access and enhancing security.
 ##--------------------------------------------------------------------------------------
 resource "azurerm_storage_account_network_rules" "network-rules" {
   for_each                   = var.enabled && var.enable_network_rules ? { for i, rule in var.network_rules : i => rule } : {}
@@ -280,7 +280,7 @@ resource "azurerm_storage_account_network_rules" "network-rules" {
 }
 
 ##---------------------------------------------------------------------------------------------------------------------------
-## Threat Protection - Create threat protection to detect and respond to suspicious or potentially malicious activities. 
+## Threat Protection - Create threat protection to detect and respond to suspicious or potentially malicious activities.
 ##---------------------------------------------------------------------------------------------------------------------------
 resource "azurerm_advanced_threat_protection" "atp" {
   count              = local.create_advanced_threat_protection ? 1 : 0
@@ -299,7 +299,7 @@ resource "azurerm_storage_container" "container" {
 }
 
 ##---------------------------------------------------------------------------------------------------------
-## Storage Share - Creates an Azure File Share within the storage account to support file-level storage 
+## Storage Share - Creates an Azure File Share within the storage account to support file-level storage
 ## for lift-and-shift applications, legacy workloads, or shared storage needs.
 ##---------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_share" "fileshare" {
@@ -309,9 +309,9 @@ resource "azurerm_storage_share" "fileshare" {
   quota              = var.file_shares[count.index].quota
 }
 
-##------------------------------------------------------------------------------------------------------ 
-## Storage Table -  Creates an Azure Table within the storage account to provide a NoSQL key-value 
-## store for structured, non-relational data.  
+##------------------------------------------------------------------------------------------------------
+## Storage Table -  Creates an Azure Table within the storage account to provide a NoSQL key-value
+## store for structured, non-relational data.
 ##------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_table" "tables" {
   count                = var.enabled ? length(var.tables) : 0
@@ -319,8 +319,8 @@ resource "azurerm_storage_table" "tables" {
   storage_account_name = azurerm_storage_account.storage[0].name
 }
 
-##--------------------------------------------------------------------------------------------------------- 
-## Storage Queue - Creates an Azure Storage Queue within the storage account to support asynchronous 
+##---------------------------------------------------------------------------------------------------------
+## Storage Queue - Creates an Azure Storage Queue within the storage account to support asynchronous
 ## message-based communication between application components.
 ##---------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_queue" "queues" {
@@ -330,8 +330,8 @@ resource "azurerm_storage_queue" "queues" {
 }
 
 ##-------------------------------------------------------------------------------------------------------
-## Storage Management Policy - Defines lifecycle management rules for blob data within the storage 
-## account, helping automate data retention, cost optimization, and compliance.  
+## Storage Management Policy - Defines lifecycle management rules for blob data within the storage
+## account, helping automate data retention, cost optimization, and compliance.
 ##-------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_management_policy" "lifecycle_management" {
   count              = local.create_storage_mgmt_policy ? length(var.management_policy) : 0
@@ -372,8 +372,8 @@ resource "azurerm_storage_management_policy" "lifecycle_management" {
   }
 }
 
-##----------------------------------------------------------------------------- 
-## Private Endpoint - Create private endpoint for storage account. 
+##-----------------------------------------------------------------------------
+## Private Endpoint - Create private endpoint for storage account.
 ##-----------------------------------------------------------------------------
 resource "azurerm_private_endpoint" "pep" {
   count               = var.enabled && var.enable_private_endpoint ? 1 : 0
@@ -422,8 +422,8 @@ resource "azurerm_monitor_diagnostic_setting" "storage" {
   }
 }
 
-##----------------------------------------------------------------------------- 
-## Monitor Diagnostic Setting - Create diagnostic setting for storage Data. 
+##-----------------------------------------------------------------------------
+## Monitor Diagnostic Setting - Create diagnostic setting for storage Data.
 ##-----------------------------------------------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "datastorage" {
   depends_on                     = [azurerm_storage_account.storage]
@@ -450,8 +450,8 @@ resource "azurerm_monitor_diagnostic_setting" "datastorage" {
   }
 }
 
-##----------------------------------------------------------------------------- 
-## Monitor Diagnostic Setting - Create diagnostic setting for storage-nic. 
+##-----------------------------------------------------------------------------
+## Monitor Diagnostic Setting - Create diagnostic setting for storage-nic.
 ##-----------------------------------------------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "storage-nic" {
   depends_on                     = [azurerm_private_endpoint.pep]
@@ -475,8 +475,8 @@ resource "azurerm_monitor_diagnostic_setting" "storage-nic" {
   }
 }
 
-##----------------------------------------------------------------------------- 
-## Monitor Diagnostic Setting - Create diagnostic setting for storage blob. 
+##-----------------------------------------------------------------------------
+## Monitor Diagnostic Setting - Create diagnostic setting for storage blob.
 ##-----------------------------------------------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "storage_blob" {
   count                          = var.enabled && var.enable_blob_diagnostics ? 1 : 0
@@ -502,8 +502,8 @@ resource "azurerm_monitor_diagnostic_setting" "storage_blob" {
   }
 }
 
-##----------------------------------------------------------------------------- 
-## Monitor Diagnostic Setting - Create diagnostic setting for storage table. 
+##-----------------------------------------------------------------------------
+## Monitor Diagnostic Setting - Create diagnostic setting for storage table.
 ##-----------------------------------------------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "storage_table" {
   count                          = var.enabled && var.enable_table_diagnostics ? 1 : 0
@@ -529,8 +529,8 @@ resource "azurerm_monitor_diagnostic_setting" "storage_table" {
   }
 }
 
-##----------------------------------------------------------------------------- 
-## Monitor Diagnostic Setting - Create diagnostic setting for storage queue. 
+##-----------------------------------------------------------------------------
+## Monitor Diagnostic Setting - Create diagnostic setting for storage queue.
 ##-----------------------------------------------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "storage_queue" {
   count                          = var.enabled && var.enable_queue_diagnostics ? 1 : 0
@@ -556,8 +556,8 @@ resource "azurerm_monitor_diagnostic_setting" "storage_queue" {
   }
 }
 
-##----------------------------------------------------------------------------- 
-## Monitor Diagnostic Setting - Create diagnostic setting for storage file. 
+##-----------------------------------------------------------------------------
+## Monitor Diagnostic Setting - Create diagnostic setting for storage file.
 ##-----------------------------------------------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "storage_file" {
   count                          = var.enabled && var.enable_file_diagnostics ? 1 : 0

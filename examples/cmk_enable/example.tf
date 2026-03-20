@@ -5,7 +5,7 @@ provider "azurerm" {
 
 data "azurerm_client_config" "current_client_config" {}
 
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 ## Resource Group module call
 ##-----------------------------------------------------------------------------
 module "resource_group" {
@@ -38,9 +38,9 @@ module "vault" {
   enable_private_endpoint = false
 }
 
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 ## Storage module call.
-## Here storage account will be deployed with CMK encryption. 
+## Here storage account will be deployed with CMK encryption.
 ##-----------------------------------------------------------------------------
 module "storage" {
   source                        = "../.."
