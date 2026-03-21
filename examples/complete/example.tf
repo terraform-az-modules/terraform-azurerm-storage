@@ -56,7 +56,7 @@ module "subnet" {
 # ------------------------------------------------------------------------------
 module "log-analytics" {
   source                      = "terraform-az-modules/log-analytics/azurerm"
-  version                     = "1.0.2"
+  version                     = "1.0.3"
   name                        = "core"
   environment                 = "qa"
   label_order                 = ["name", "environment", "location"]
