@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.0.0] - 2026-04-21
+### :wrench: Chores
+- [`c18e785`](https://github.com/terraform-az-modules/terraform-azurerm-storage/commit/c18e785261c5c1b7069de7b0faaf25d1547909df) - **deps**: bump actions/checkout from 3 to 6 *(commit by [@dependabot[bot]](https://github.com/apps/dependabot))*
+
+
 ## [v1.3.0] - 2026-04-17
 ### :bug: Bug Fixes
 - [`2084e00`](https://github.com/terraform-az-modules/terraform-azurerm-storage/commit/2084e00a04d27c609fa0df53bdcd11bf33a3209e) - consolidate versions.tf, remove provider_meta, upgrade to azurerm >= 4.0 *(commit by [@anmolnagpal](https://github.com/anmolnagpal))*
@@ -35,3 +40,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Set provider: none in tf-checks for validate-only CI
 - Bump required_version to >= 1.10.0
 [v1.3.0]: https://github.com/terraform-az-modules/terraform-azurerm-storage/compare/v1.2.1...v1.3.0
+[v2.0.0]: https://github.com/terraform-az-modules/terraform-azurerm-storage/compare/v1.3.0...v2.0.0
