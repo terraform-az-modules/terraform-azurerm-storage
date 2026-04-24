@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v3.0.0] - 2026-04-24
+### :wrench: Chores
+- [`7cad6cb`](https://github.com/terraform-az-modules/terraform-azurerm-storage/commit/7cad6cbe8229a6b519e9e3535ff6156b0e616667) - **deps**: bump terraform-az-modules/key-vault/azurerm *(commit by [@dependabot[bot]](https://github.com/apps/dependabot))*
+
+
 ## [v2.0.0] - 2026-04-21
 ### :wrench: Chores
 - [`c18e785`](https://github.com/terraform-az-modules/terraform-azurerm-storage/commit/c18e785261c5c1b7069de7b0faaf25d1547909df) - **deps**: bump actions/checkout from 3 to 6 *(commit by [@dependabot[bot]](https://github.com/apps/dependabot))*
@@ -41,3 +46,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bump required_version to >= 1.10.0
 [v1.3.0]: https://github.com/terraform-az-modules/terraform-azurerm-storage/compare/v1.2.1...v1.3.0
 [v2.0.0]: https://github.com/terraform-az-modules/terraform-azurerm-storage/compare/v1.3.0...v2.0.0
+[v3.0.0]: https://github.com/terraform-az-modules/terraform-azurerm-storage/compare/v2.0.0...v3.0.0
