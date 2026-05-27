@@ -341,7 +341,7 @@ resource "azurerm_storage_management_policy" "lifecycle_management" {
     for_each = var.management_policy
     iterator = it
     content {
-      name    = "rule${it.key}"
+      name    = it.value.name
       enabled = true
       filters {
         prefix_match = it.value.prefix_match
@@ -366,6 +366,13 @@ resource "azurerm_storage_management_policy" "lifecycle_management" {
           delete_after_days_since_creation_greater_than                  = it.value.snapshot_delete_after_days
           tier_to_archive_after_days_since_last_tier_change_greater_than = it.value.tier_to_archive_after_days_since_last_tier_change_greater_than
           tier_to_cold_after_days_since_creation_greater_than            = it.value.tier_to_cold_after_days_since_creation_greater_than
+        }
+        version {
+          change_tier_to_archive_after_days_since_creation               = it.value.change_tier_to_archive_after_days_since_creation
+          tier_to_archive_after_days_since_last_tier_change_greater_than = it.value.tier_to_archive_after_days_since_last_tier_change_greater_than
+          change_tier_to_cool_after_days_since_creation                  = it.value.change_tier_to_cool_after_days_since_creation
+          tier_to_cold_after_days_since_creation_greater_than            = it.value.tier_to_cold_after_days_since_creation_greater_than
+          delete_after_days_since_creation                               = it.value.delete_after_days_since_creation
         }
       }
     }
