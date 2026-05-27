@@ -290,7 +290,7 @@ variable "enable_queue" {
 variable "management_policy" {
   description = "Configure Azure Storage firewalls and virtual networks"
   type = list(object({
-    name                                                           = string
+    name                                                           = optional(string)
     prefix_match                                                   = set(string)
     tier_to_cool_after_days                                        = optional(number)
     tier_to_archive_after_days                                     = optional(number)
