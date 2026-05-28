@@ -334,7 +334,7 @@ resource "azurerm_storage_queue" "queues" {
 ## account, helping automate data retention, cost optimization, and compliance.
 ##-------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_management_policy" "lifecycle_management" {
-  count              = local.create_storage_mgmt_policy ? length(var.management_policy) : 0
+  count              = local.create_storage_mgmt_policy ? 1 : 0
   storage_account_id = azurerm_storage_account.storage[0].id
 
   dynamic "rule" {
