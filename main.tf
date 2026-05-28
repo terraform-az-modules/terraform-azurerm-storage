@@ -338,7 +338,7 @@ resource "azurerm_storage_management_policy" "lifecycle_management" {
   storage_account_id = azurerm_storage_account.storage[0].id
 
   dynamic "rule" {
-    for_each = var.management_policy
+    for_each = [var.management_policy[count.index]]
     iterator = it
     content {
       name    = coalesce(it.value.name, "rule${it.key}")
