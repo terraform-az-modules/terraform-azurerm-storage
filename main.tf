@@ -314,9 +314,9 @@ resource "azurerm_storage_share" "fileshare" {
 ## store for structured, non-relational data.
 ##------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_table" "tables" {
-  count                = var.enabled ? length(var.tables) : 0
-  name                 = var.tables[count.index]
-  storage_account_name = azurerm_storage_account.storage[0].name
+  count              = var.enabled ? length(var.tables) : 0
+  name               = var.tables[count.index]
+  storage_account_id = azurerm_storage_account.storage[0].id
 }
 
 ##---------------------------------------------------------------------------------------------------------
