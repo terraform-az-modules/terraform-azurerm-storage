@@ -461,7 +461,7 @@ resource "azurerm_monitor_diagnostic_setting" "datastorage" {
 resource "azurerm_monitor_diagnostic_setting" "storage_nic" {
   depends_on                     = [azurerm_private_endpoint.pep]
   count                          = local.create_monitor_diagnostic_nic ? 1 : 0
-  name                           = var.resource_position_prefix ? format("nic-diag-st-%s", local.name) : format("%s-nic-diag-st", local.name)
+  name                           = var.resource_position_prefix ? format("nic-diag-sa-%s", local.name) : format("%s-nic-diag-sa", local.name)
   target_resource_id             = element(azurerm_private_endpoint.pep[count.index].network_interface[*].id, count.index)
   storage_account_id             = var.storage_account_id
   eventhub_name                  = var.eventhub_name
