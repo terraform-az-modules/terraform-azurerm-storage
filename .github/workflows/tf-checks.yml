@@ -6,31 +6,31 @@ on:
 
 jobs:
   basic-example:
-    uses: clouddrove/github-shared-workflows/.github/workflows/stf-checks.yml@v2
+    uses: clouddrove/github-shared-workflows/.github/workflows/smurf-tf-checks.yml@v2
     with:
       working_directory: './examples/basic/'
       provider: none
 
   cmk-enabled-example:
-    uses: clouddrove/github-shared-workflows/.github/workflows/stf-checks.yml@v2
+    uses: clouddrove/github-shared-workflows/.github/workflows/smurf-tf-checks.yml@v2
     with:
       working_directory: './examples/cmk_enable/'
       provider: none
 
   complete-example:
-    uses: clouddrove/github-shared-workflows/.github/workflows/stf-checks.yml@v2
+    uses: clouddrove/github-shared-workflows/.github/workflows/smurf-tf-checks.yml@v2
     with:
       working_directory: './examples/complete/'
       provider: none
 
   private-endpoint-example:
-    uses: clouddrove/github-shared-workflows/.github/workflows/stf-checks.yml@v2
+    uses: clouddrove/github-shared-workflows/.github/workflows/smurf-tf-checks.yml@v2
     with:
       working_directory: './examples/private_endpoint/'
       provider: none
 
   static-website-example:
-    uses: clouddrove/github-shared-workflows/.github/workflows/stf-checks.yml@v2
+    uses: clouddrove/github-shared-workflows/.github/workflows/smurf-tf-checks.yml@v2
     with:
       working_directory: './examples/static_website/'
       provider: none
