@@ -79,6 +79,7 @@
 | name | Name  (e.g. `app` or `cluster`). | `string` | `""` | no |
 | network\_rules | List of objects that represent the configuration of each network rule. | <pre>list(object({<br>    default_action             = string<br>    ip_rules                   = list(string)<br>    virtual_network_subnet_ids = optional(list(string), [])<br>    bypass                     = optional(list(string), [])<br>  }))</pre> | <pre>[<br>  {<br>    "bypass": [<br>      "AzureServices"<br>    ],<br>    "default_action": "Deny",<br>    "ip_rules": [],<br>    "virtual_network_subnet_ids": []<br>  }<br>]</pre> | no |
 | nfsv3\_enabled | Is NFSv3 protocol enabled? Changing this forces a new resource to be created. | `bool` | `false` | no |
+| nic\_metrics | Metric categories for the private endpoint NIC diagnostic setting. Only 'AllMetrics' is supported for network interfaces. | `list(string)` | <pre>[<br>  "AllMetrics"<br>]</pre> | no |
 | private\_dns\_zone\_ids | The IDs of a private DNS zone. | `string` | `null` | no |
 | private\_link\_access | List of Privatelink objects to allow access from. | <pre>list(object({<br>    endpoint_resource_id = string<br>    endpoint_tenant_id   = string<br>  }))</pre> | `[]` | no |
 | public\_network\_access\_enabled | Whether the public network access is enabled? Defaults to true. | `bool` | `true` | no |
