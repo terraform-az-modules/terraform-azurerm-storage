@@ -894,3 +894,9 @@ variable "file_metrics" {
   default     = ["Transaction", "Capacity"]
   description = "Metric categories for File service diagnostics."
 }
+
+variable "nic_metrics" {
+  type        = list(string)
+  default     = ["AllMetrics"]
+  description = "Metric categories for the private endpoint NIC diagnostic setting. Only 'AllMetrics' is supported for network interfaces."
+}
