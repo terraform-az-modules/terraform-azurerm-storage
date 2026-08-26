@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v4.0.0] - 2026-08-26
+### :bug: Bug Fixes
+- [`3454d84`](https://github.com/terraform-az-modules/terraform-azurerm-storage/commit/3454d843e658178f65c23a17dac48a7f72013e53) - replace storage account name to id *(PR [#72](https://github.com/terraform-az-modules/terraform-azurerm-storage/pull/72) by [@karan-cd](https://github.com/karan-cd))*
+
+
 ## [v3.3.0] - 2026-08-25
 ### :bug: Bug Fixes
 - [`5220f60`](https://github.com/terraform-az-modules/terraform-azurerm-storage/commit/5220f60296b5809edf2f2489aaa160c9b725b6ee) - updated diagnostics for storage-nic to support version 5.0 *(commit by [@maharshi-cd](https://github.com/maharshi-cd))*
@@ -56,3 +61,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [v2.0.0]: https://github.com/terraform-az-modules/terraform-azurerm-storage/compare/v1.3.0...v2.0.0
 [v3.0.0]: https://github.com/terraform-az-modules/terraform-azurerm-storage/compare/v2.0.0...v3.0.0
 [v3.3.0]: https://github.com/terraform-az-modules/terraform-azurerm-storage/compare/v3.2.0...v3.3.0
+[v4.0.0]: https://github.com/terraform-az-modules/terraform-azurerm-storage/compare/v3.3.0...v4.0.0
