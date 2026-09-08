@@ -10,8 +10,8 @@ This example demonstrates a basic usage of the `terraform-azure-storage` module.
 
 | Name      | Version   |
 |-----------|-----------|
-| Terraform | >= 1.6.6  |
-| Azurerm   | >= 3.116.0|
+| Terraform | >= 1.10.0 |
+| Azurerm   | ~> 5.4    |
 
 ---
 

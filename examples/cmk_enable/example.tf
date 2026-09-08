@@ -21,7 +21,7 @@ module "resource_group" {
 # ------------------------------------------------------------------------------
 module "vault" {
   source                        = "terraform-az-modules/key-vault/azurerm"
-  version                       = "1.0.1"
+  version                       = "3.2.0"
   name                          = "core"
   environment                   = "prod"
   label_order                   = ["name", "environment", "location"]
