@@ -10,8 +10,8 @@ This example demonstrates how to deploy an Azure Storage Account using the `terr
 
 | Name      | Version   |
 |-----------|-----------|
-| Terraform | >= 1.6.6  |
-| Azurerm   | >= 3.116.0|
+| Terraform | >= 1.10.0 |
+| Azurerm   | ~> 5.4    |
 
 ---
 
@@ -19,7 +19,7 @@ This example demonstrates how to deploy an Azure Storage Account using the `terr
 
 | Name    | Version   |
 |---------|-----------|
-| azurerm | >= 3.116.0|
+| azurerm | ~> 5.4    |
 
 ---
 
@@ -29,7 +29,7 @@ This example demonstrates how to deploy an Azure Storage Account using the `terr
 |----------------|----------------------------------------------------------|---------|
 | resource_group | terraform-az-modules/resource-group/azurerm               | 1.0.3   |
 | storage        | ../..                                                   | n/a     |
-| vault          | terraform-az-modules/key-vault/azurerm     | 1.0.1 |
+| vault          | terraform-az-modules/key-vault/azurerm     | 3.2.0 |
 
 ---
 
