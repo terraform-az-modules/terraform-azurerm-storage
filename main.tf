@@ -337,6 +337,7 @@ resource "azurerm_storage_management_policy" "lifecycle_management" {
   count              = local.create_storage_mgmt_policy ? 1 : 0
   storage_account_id = azurerm_storage_account.storage[0].id
 
+
   dynamic "rule" {
     for_each = var.management_policy
     iterator = it
@@ -345,7 +346,7 @@ resource "azurerm_storage_management_policy" "lifecycle_management" {
       enabled = true
       filters {
         prefix_match = it.value.prefix_match
-        blob_types   = ["blockBlob"]
+        blob_types   = it.value.blob_types
       }
       actions {
         base_blob {
@@ -362,15 +363,21 @@ resource "azurerm_storage_management_policy" "lifecycle_management" {
           tier_to_cold_after_days_since_last_access_time_greater_than    = it.value.tier_to_cold_after_days_since_last_access_time_greater_than
           tier_to_cool_after_days_since_last_access_time_greater_than    = it.value.tier_to_cool_after_days_since_last_access_time_greater_than
         }
-        snapshot {
-          delete_after_days_since_creation_greater_than                  = it.value.snapshot_delete_after_days
-          tier_to_archive_after_days_since_last_tier_change_greater_than = it.value.tier_to_archive_after_days_since_last_tier_change_greater_than
-          tier_to_cold_after_days_since_creation_greater_than            = it.value.tier_to_cold_after_days_since_creation_greater_than
+        dynamic "snapshot" {
+          for_each = (it.value.snapshot_delete_after_days != null || it.value.tier_to_archive_after_days_since_last_tier_change_greater_than != null || it.value.tier_to_cold_after_days_since_creation_greater_than != null) ? [1] : []
+          content {
+            delete_after_days_since_creation_greater_than                  = it.value.snapshot_delete_after_days
+            tier_to_archive_after_days_since_last_tier_change_greater_than = it.value.tier_to_archive_after_days_since_last_tier_change_greater_than
+            tier_to_cold_after_days_since_creation_greater_than            = it.value.tier_to_cold_after_days_since_creation_greater_than
+          }
         }
-        version {
-          change_tier_to_archive_after_days_since_creation = it.value.change_tier_to_archive_after_days_since_creation
-          change_tier_to_cool_after_days_since_creation    = it.value.change_tier_to_cool_after_days_since_creation
-          delete_after_days_since_creation                 = it.value.delete_after_days_since_creation
+        dynamic "version" {
+          for_each = (it.value.change_tier_to_archive_after_days_since_creation != null || it.value.change_tier_to_cool_after_days_since_creation != null || it.value.delete_after_days_since_creation != null) ? [1] : []
+          content {
+            change_tier_to_archive_after_days_since_creation = it.value.change_tier_to_archive_after_days_since_creation
+            change_tier_to_cool_after_days_since_creation    = it.value.change_tier_to_cool_after_days_since_creation
+            delete_after_days_since_creation                 = it.value.delete_after_days_since_creation
+          }
         }
       }
     }

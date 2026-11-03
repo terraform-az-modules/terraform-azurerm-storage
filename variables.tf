@@ -312,6 +312,7 @@ variable "management_policy" {
     change_tier_to_archive_after_days_since_creation               = optional(number)
     change_tier_to_cool_after_days_since_creation                  = optional(number)
     delete_after_days_since_creation                               = optional(number)
+    blob_types                                                     = optional(list(string), ["blockBlob"])
 
   }))
   default = [{
